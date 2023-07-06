@@ -172,4 +172,5 @@ public class Communicator extends AgArch {
             this.commBridge.cleanAtributesOfTransference();
         }
     }
+
 }
