@@ -221,11 +221,17 @@
       <artifactId>contextnet</artifactId>
       <version>2.7</version>
     </dependency>
-    <!-- Jade 4.0.1/Ant dependency>
-      <groupId>...</groupId>
-      <artifactId>...</artifactId>
-      <version>...</version>
-    </dependency-->
+      <dependency>
+          <groupId>org.jetbrains</groupId>
+          <artifactId>annotations</artifactId>
+          <version>RELEASE</version>
+          <scope>compile</scope>
+      </dependency>
+      <!-- Jade 4.0.1/Ant dependency>
+        <groupId>...</groupId>
+        <artifactId>...</artifactId>
+        <version>...</version>
+      </dependency-->
   </dependencies>
     <properties>
         <maven.compiler.source>1.5</maven.compiler.source>

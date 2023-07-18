@@ -56,7 +56,7 @@ import java.util.logging.Level;
  * Users can customize the architecture by overriding some methods of this
  * class.
  */
-public class AgArch implements AgArchInfraTier, Comparable<AgArch> {
+public abstract class AgArch implements AgArchInfraTier, Comparable<AgArch> {
 
     //[Pantoja]
     private String port = "";
@@ -358,6 +358,9 @@ public class AgArch implements AgArchInfraTier, Comparable<AgArch> {
 
     public void addMessageToC() {
     }
+
+    public abstract EMailMiddleware getEmailBridge();
+
 
     public void instantiateAgents() {}
 
