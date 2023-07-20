@@ -11,7 +11,10 @@ public class sendEMail extends DefaultInternalAction {
     @Override
     public Object execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         if (args.length == 3) {
-            ts.getUserAgArch().getEmailBridge().sendMsg(args[0].toString(),args[1].toString(),args[2].toString());
+            ts.getUserAgArch().getEmailBridge().sendMsg(
+                    args[0].toString().replaceAll("\"",""),
+                    args[1].toString(),
+                    args[2].toString());
             return true;
         } else return false;
 

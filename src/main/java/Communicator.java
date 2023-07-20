@@ -15,8 +15,8 @@ public class Communicator extends AgArch {
 
     @Override
     public void addMessageToC() {
-        if (this.emailBridge.getLogin()==null || this.emailBridge.getPassword()==null ){
-            ArrayList<Message> list = this.emailBridge.checkMail();
+        if (this.emailBridge.getLogin()!=null && this.emailBridge.getPassword()!=null ){
+            ArrayList<Message> list = this.emailBridge.checkEMail();
             for (Message item : list) {
                 this.getTS().getC().addMsg(item);
             }

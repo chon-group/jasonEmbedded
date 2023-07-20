@@ -5,11 +5,7 @@ import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.*;
 
-
-
 public class EMailMiddleware{
-
-
     private String Shost,Rhost;
     private String Sport,Rport;
     private String Sprotocol,Rprotocol;
@@ -17,8 +13,6 @@ public class EMailMiddleware{
     private String password;
     private boolean Sauth, Sstarttls, Ssslenable,Rauth, Rstarttls, Rsslenable;
     private String Sssltrust,Ssslprotocol,Rssltrust,Rsslprotocol;
-
-    //private Properties props = new Properties();
 
     public Properties sslProps () {
         //Checks which properties are required for the connection / else uses the defaut
@@ -56,36 +50,8 @@ public class EMailMiddleware{
 
         return properties;
     }
-
-    /*public Session connection() {
-        Properties props = sslProps();
-        try {
-            props.put("mail.store.protocol", protocol);
-            props.put("mail." + protocol + ".host", host);
-            props.put("mail." + protocol + ".port", port);
-            props.put("mail." + protocol + ".leaveonserver", false);
-
-            if (protocol.equalsIgnoreCase("smtp")){
-                props.put("mail.smtp.socketFactory.port", port);
-                props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
-            }
-            Session session = Session.getInstance(props, new Authenticator() {
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(login, password);
-                }
-            });
-            return session;
-
-            //Session defaultInstance = Session.getDefaultInstance(props);
-            //return defaultInstance;
-        }catch (Exception e){
-            System.out.println("Connection error:" + e);
-            return null;
-        }
-    }
-*/
     
-    public ArrayList<jason.asSemantics.Message> checkMail() {
+    public ArrayList<jason.asSemantics.Message> checkEMail() {
         Session session ;
         Properties props = sslProps();
         try {
@@ -110,10 +76,11 @@ public class EMailMiddleware{
             // Open the inbox folder and get the messages
             Folder inbox = store.getFolder("INBOX");
             inbox.open(Folder.READ_WRITE);
-            javax.mail.Message[] messages = inbox.getMessages();                       
-            
+            javax.mail.Message[] messages = inbox.getMessages();
+
             // Loop through the messages and printing info
             for (Message message : messages) {
+                System.out.println("[EMail] New message...");
 
                 //Skip messages marked for deletion
                 if (message.getFlags().contains(Flags.Flag.DELETED)) {
@@ -122,13 +89,13 @@ public class EMailMiddleware{
 
                 jason.asSemantics.Message jasonMsgs = new jason.asSemantics.Message();
                 jasonMsgs.setIlForce(message.getSubject());
-                jasonMsgs.setSender(convert(message.getFrom()));
+                jasonMsgs.setSender(addressToString(message.getFrom()));
                 jasonMsgs.setPropCont(message.getContent());
-                jasonMsgs.setReceiver(login);
+                //jasonMsgs.setReceiver(login);
                 jMsg.add(jasonMsgs);
 
                 //mark message for deletion
-                message.setFlag(Flags.Flag.DELETED, false);
+                message.setFlag(Flags.Flag.DELETED, true);
 
             }
             if (Rprotocol.contains("imap")){
@@ -147,7 +114,7 @@ public class EMailMiddleware{
     }
            
        
-    public static String convert(Address[] rawAddress) {
+    public static String addressToString(Address[] rawAddress) {
     	  	//Check if address is not null and convert it to regular addresses 
     		if (rawAddress != null) {
     	  		return rawAddress[0].toString();
@@ -157,6 +124,7 @@ public class EMailMiddleware{
     public void sendMsg(String recipientEmail, String subject, String message) {
         Session session;
         Properties props = sslProps();
+
         try {
             props.put("mail.store.protocol", Sprotocol);
             props.put("mail." + Sprotocol + ".host", Shost);
@@ -170,8 +138,6 @@ public class EMailMiddleware{
                     return new PasswordAuthentication(login, password);
                 }
             });
-
-
         }catch (Exception e){
             System.out.println("Connection error:" + e);
             return;
@@ -180,12 +146,14 @@ public class EMailMiddleware{
         try {
             // Create a new message
 			Message msg = new MimeMessage(session);
+
 			// Set the recipient, subject, and message content
 			msg.setFrom(new InternetAddress(login));
 			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
 			msg.setSubject(subject);
 			msg.setText(message);
-			// Send the message
+
+            // Send the message
 			Transport.send(msg,login,password);
 
 			System.out.println("Sent successfully!");
@@ -195,19 +163,26 @@ public class EMailMiddleware{
 
     }
 
-    public void setSendProps(String sprotocol,String sport, String shost) {
+    //public void setSendProps(String sprotocol,String sport, String shost) {
+    public void setSendProps(String shost,String sprotocol, String sport) {
         Sprotocol = sprotocol;
         Sport = sport;
         Shost = shost;
     }
 
-    public void setReceiverProps(String rprotocol, String rport, String rhost) {
+    public void setReceiverProps(String rhost, String rprotocol, String rport) {
         Rprotocol = rprotocol;
         Rport = rport;
         Rhost = rhost;
     }
 
     public void setSendAuth(boolean sauth,boolean sstarttls, boolean ssslenable, String sssltrust, String ssslprotocol) {
+        if(sssltrust.equals("null")){
+            sssltrust = null;
+        }
+        if(ssslprotocol.equals("null")){
+            ssslprotocol = null;
+        }
         this.Sauth = sauth;
         this.Sstarttls = sstarttls;
         this.Ssslenable = ssslenable;
@@ -215,7 +190,13 @@ public class EMailMiddleware{
         this.Ssslprotocol = ssslprotocol;
     }
 
-    public void setRauth(boolean rauth,boolean rstarttls, boolean rsslenable, String rssltrust, String rsslprotocol) {
+    public void setRAuth(boolean rauth,boolean rstarttls, boolean rsslenable, String rssltrust, String rsslprotocol) {
+        if(rssltrust.equals("null")){
+            rssltrust = null;
+        }
+        if(rsslprotocol.equals("null")){
+            rsslprotocol = null;
+        }
         this.Rauth = rauth;
         this.Rstarttls = rstarttls;
         this.Rsslenable = rsslenable;
