@@ -14,6 +14,9 @@ public class EMailMiddleware{
     private boolean Sauth, Sstarttls, Ssslenable,Rauth, Rstarttls, Rsslenable;
     private String Sssltrust,Ssslprotocol,Rssltrust,Rsslprotocol;
 
+    private boolean RHostEnable = false;
+    private boolean RPropsEnable = false;
+
     public Properties sslProps () {
         //Checks which properties are required for the connection / else uses the defaut
         Properties properties = new Properties();
@@ -165,15 +168,16 @@ public class EMailMiddleware{
 
     //public void setSendProps(String sprotocol,String sport, String shost) {
     public void setSendProps(String shost,String sprotocol, String sport) {
-        Sprotocol = sprotocol;
-        Sport = sport;
-        Shost = shost;
+        this.Sprotocol = sprotocol;
+        this.Sport = sport;
+        this.Shost = shost;
     }
 
     public void setReceiverProps(String rhost, String rprotocol, String rport) {
-        Rprotocol = rprotocol;
-        Rport = rport;
-        Rhost = rhost;
+        this.Rprotocol = rprotocol;
+        this.Rport = rport;
+        this.Rhost = rhost;
+        this.RHostEnable = true;
     }
 
     public void setSendAuth(boolean sauth,boolean sstarttls, boolean ssslenable, String sssltrust, String ssslprotocol) {
@@ -202,6 +206,7 @@ public class EMailMiddleware{
         this.Rsslenable = rsslenable;
         this.Rssltrust = rssltrust;
         this.Rsslprotocol = rsslprotocol;
+        this.RPropsEnable = true;
     }
 
     public void setLogin(String login) {
@@ -218,6 +223,14 @@ public class EMailMiddleware{
 
     public String getPassword() {
         return password;
+    }
+
+    public boolean isRHostEnable() {
+        return RHostEnable;
+    }
+
+    public boolean isRPropsEnable() {
+        return RPropsEnable;
     }
 }
 

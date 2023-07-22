@@ -1752,7 +1752,7 @@ public class TransitionSystem {
                 ag.buf(this.realWorldPerceptions());
 
                 if (this.agArch.getEmailBridge() != null) {
-                    this.agArch.addMessageToC();
+                    agArch.addMessageToC();
                 }
 
                 /*getUserAgArch().checkMail();
