@@ -1750,7 +1750,12 @@ public class TransitionSystem {
                 // [Pantoja]: ARGO
                 // ag.buf(getUserAgArch().perceive());
                 ag.buf(this.realWorldPerceptions());
-                getUserAgArch().checkMail();
+
+                if (this.agArch.getEmailBridge() != null) {
+                    this.agArch.addMessageToC();
+                }
+
+                /*getUserAgArch().checkMail();
                 // [Pantoja]: coloquei essa chamada para testar o envio de uma
                 // mensagem para MAS diferentes.
                 if (this.agArch.getCommBridge() != null) {
@@ -1773,7 +1778,7 @@ public class TransitionSystem {
                                 DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss.SSS")));
                         this.agArch.killAllAgents();
                     }
-                }
+                }*/
             }
             nrcslbr++; // counting number of cycles since last belief revision
 
