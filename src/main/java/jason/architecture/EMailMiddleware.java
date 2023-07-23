@@ -90,10 +90,17 @@ public class EMailMiddleware{
                     continue;
                 }
 
+                jason.asSemantics.Message jasonMsgs = new jason.asSemantics.Message(
+                        message.getSubject(),
+                        addressToString(message.getFrom()),
+                        null,
+                        message.getContent());
+                /*
                 jason.asSemantics.Message jasonMsgs = new jason.asSemantics.Message();
                 jasonMsgs.setIlForce(message.getSubject());
                 jasonMsgs.setSender(addressToString(message.getFrom()));
                 jasonMsgs.setPropCont(message.getContent());
+                */
                 //jasonMsgs.setReceiver(login);
                 jMsg.add(jasonMsgs);
 
