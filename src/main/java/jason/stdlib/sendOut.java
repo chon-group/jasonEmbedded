@@ -186,6 +186,7 @@ public class sendOut extends DefaultInternalAction {
         }
         Term ilf = args[1];
         Term pcnt = args[2];
+        // if (pode executar?) chamando a classe ...
         ts.getUserAgArch().getCommBridge().sendMsgToContextNet(ts.getUserAgArch().getCommBridge().getMyUUID(), to, ilf, pcnt);
         return true;
     }

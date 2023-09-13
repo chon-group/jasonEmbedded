@@ -18,9 +18,30 @@ import java.util.Map;
 public class Communicator extends AgArch {
 
     private CommMiddleware commBridge = null;
-
     private static final String AGENT_FILE_EXTENSION = ".asl";
 
+    private String policyList;
+    private String ruleList;
+    @Override
+    public void setFirewall(String tipo,String values) {
+        if (tipo.equals("policy")) {
+            this.policyList = values;
+        } else if (tipo.equals("rule")) {
+            this.ruleList = values;
+        } else {
+            System.out.println("deu erro");
+        }
+    }
+    @Override
+    public String getFirewall(String tipo) {
+        if (tipo.equals("policy")) {
+            return this.policyList;
+        } else if (tipo.equals("rule")) {
+            return this.ruleList;
+        } else {
+            return "deu erro";
+        }
+    }
     @Override
     public void connectCN(String gatewayIP, int gatewayPort, String myUUID) {
         this.commBridge = new CommMiddleware(gatewayIP, gatewayPort, myUUID);

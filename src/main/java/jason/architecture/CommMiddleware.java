@@ -132,6 +132,8 @@ public class CommMiddleware implements NodeConnectionListener {
      * Jason.
      */
     public void newMessageReceived(NodeConnection remoteCon, Message message) {
+       // System.out.print("Mensagem" + message.getContentObject());
+        // if( pode executar ) ...
         if (message.getContentObject() instanceof String) {
             this.extractMessageFromContextNet(message.getContentObject().toString().toCharArray());
 
