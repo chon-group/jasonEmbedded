@@ -1,5 +1,6 @@
 package jason.stdlib;
 
+import com.google.gson.JsonObject;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
@@ -20,6 +21,7 @@ public class policy extends DefaultInternalAction{
 
     private String determinacao;
 
+    private JsonObject politica;
     public policy(){
 
     }
@@ -46,7 +48,12 @@ public class policy extends DefaultInternalAction{
                         if( !args[3].toString().equals("accept") && !args[3].toString().equals("drop")){
                             System.out.println("O valor inserido na politica para determinação está incorreto. accept/drop");
                         }else{
-                            policy politica = new policy(args[0].toString(), args[1].toString(), args[2].toString(), args[3].toString());
+                            policy p = new policy(args[0].toString(), args[1].toString(), args[2].toString(), args[3].toString());
+                            JsonObject politica = new JsonObject();
+                            politica.addProperty("tipo", args[0].toString());
+                            politica.addProperty("abrangencia", args[1].toString());
+                            politica.addProperty("forca", args[2].toString());
+                            politica.addProperty("determinacao", args[3].toString());
                             ts.getUserAgArch().setFirewallPolicy(politica);
                         }
                     }

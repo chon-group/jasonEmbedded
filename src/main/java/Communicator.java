@@ -1,3 +1,5 @@
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import jason.AslTransferenceModel;
 import jason.architecture.AgArch;
 import jason.architecture.CommMiddleware;
@@ -22,8 +24,8 @@ public class Communicator extends AgArch {
     private CommMiddleware commBridge = null;
     private static final String AGENT_FILE_EXTENSION = ".asl";
 
-    private List<policy> policyList;
-    private List<rule> ruleList;
+    private JsonArray policyList = new JsonArray();
+    private ArrayList<rule> ruleList;
 
     public void setFirewallRule(rule regra) {
         try {
@@ -32,12 +34,13 @@ public class Communicator extends AgArch {
             System.out.println("Deu error para acrescentar na lista de regras");
         }
     }
-    public void setFirewallPolicy(policy p) {
+    public void setFirewallPolicy(JsonObject p) {
         try {
-            System.out.println(policyList);
-            System.out.println(p);
+
             policyList.add(p);
-            System.out.println(policyList);
+            for(int i=0;i<policyList.size(); i++) {
+                System.out.println(policyList.get(i).getAsJsonObject().get("tipo"));
+            }
         }catch(Exception e){
             System.out.println("Deu error para acrescentar na lista de politicas");
         }
