@@ -14,39 +14,46 @@ import jason.asSyntax.Term;
  **/
 public class policy extends DefaultInternalAction{
 
-    private boolean lastSendWasSynAsk = false;
-    @Override
-    public boolean suspendIntention() {
-        return lastSendWasSynAsk;
-    }
+    private String tipo;
+    private String abrangencia;
+    private String protocolo;
 
-    @Override
-    public boolean canBeUsedInContext() {
-        return false;
-    }
+    private String determinacao;
 
-    @Override
-    public int getMinArgs() {
-        return 3;
-    }
+    public policy(){
 
-    @Override
-    public int getMaxArgs() {
-        return 5;
     }
-
+    public policy(String tipo, String abrangencia, String protocolo, String determinacao){
+        this.tipo = tipo;
+        this.abrangencia = abrangencia;
+        this.protocolo = protocolo;
+        this.determinacao = determinacao;
+    }
     @Override
     public Object execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        ts.getUserAgArch().setFirewall("policy",args[0].toString());
-        System.out.println(ts.getUserAgArch().getFirewall("policy"));
-        //checkArguments(args);
-        //String to = args[0].toString();
-        //if (!to.startsWith("\"")) {
-        //    to = "\"" + to + "\"";
-        //}
-        //Term ilf = args[1];
-        //Term pcnt = args[2];
-        //ts.getUserAgArch().getCommBridge().sendMsgToContextNet(ts.getUserAgArch().getCommBridge().getMyUUID(), to, ilf, pcnt);
-        return true;
+        if(args.length != 4){
+            System.out.println("Numero incorreto de argumentos para criar uma nova politica");
+        }else{
+            if(!args[0].toString().equals("input") && !args[0].toString().equals("output")){
+                System.out.println("O valor inserido na politica para tipo está incorreto. input/output");
+            }else{
+                if(!args[1].toString().equals("all") && !args[1].toString().equals("communication") && !args[1].toString().equals("migration")){
+                    System.out.println("O valor inserido na politica para abrangencia está incorreto. all/communication/migration");
+                }else{
+                    if(!args[2].toString().equals("all") && !args[2].toString().equals("illocutionary") && !args[2].toString().equals("bioinsp")){
+                        System.out.println("O valor inserido na politica para força/protocolo eśta incorreto. all/illocutionary/bioinsp");
+                    }else{
+                        if( !args[3].toString().equals("accept") && !args[3].toString().equals("drop")){
+                            System.out.println("O valor inserido na politica para determinação está incorreto. accept/drop");
+                        }else{
+                            policy politica = new policy(args[0].toString(), args[1].toString(), args[2].toString(), args[3].toString());
+                            ts.getUserAgArch().setFirewallPolicy(politica);
+                        }
+                    }
+                }
+            }
+        }
+    return true;
     }
+
 }

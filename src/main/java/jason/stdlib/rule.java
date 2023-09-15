@@ -7,45 +7,35 @@ import jason.asSyntax.Term;
 
 /**
  * <p>
- * Internal action: <b><code>.policy</code></b>.
+ * Internal action: <b><code>.rule</code></b>.
  *
  * <p>
  **/
 public class rule extends DefaultInternalAction{
 
-    private boolean lastSendWasSynAsk = false;
-    @Override
-    public boolean suspendIntention() {
-        return lastSendWasSynAsk;
-    }
+    private String tipo;
+    private String abrangencia;
+    private String origem;
+    private String destino;
+    private String protocolo;
 
-    @Override
-    public boolean canBeUsedInContext() {
-        return false;
-    }
+    private String determinacao;
 
-    @Override
-    public int getMinArgs() {
-        return 3;
-    }
+    public rule(){
 
-    @Override
-    public int getMaxArgs() {
-        return 5;
+    }
+    public rule(String tipo, String abrangencia, String origem, String destino, String protocolo, String determinacao){
+        this.tipo = tipo;
+        this.abrangencia = abrangencia;
+        this.origem = origem;
+        this.destino = destino;
+        this.protocolo = protocolo;
+        this.determinacao = determinacao;
     }
     
     @Override
     public Object execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        ts.getUserAgArch().setFirewall("rule",args[0].toString());
-        System.out.println(ts.getUserAgArch().getFirewall("rule"));
-        //checkArguments(args);
-        //String to = args[0].toString();
-        //if (!to.startsWith("\"")) {
-        //    to = "\"" + to + "\"";
-        //}
-        //Term ilf = args[1];
-        //Term pcnt = args[2];
-        //ts.getUserAgArch().getCommBridge().sendMsgToContextNet(ts.getUserAgArch().getCommBridge().getMyUUID(), to, ilf, pcnt);
+
         return true;
     }
 }

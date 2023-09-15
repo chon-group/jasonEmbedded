@@ -6,6 +6,8 @@ import jason.infra.centralised.CentralisedAgArch;
 import jason.infra.centralised.RunCentralisedMAS;
 import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
+import jason.stdlib.policy;
+import jason.stdlib.rule;
 import jason.util.BioInspiredProtocolLogUtils;
 
 import java.io.File;
@@ -20,24 +22,32 @@ public class Communicator extends AgArch {
     private CommMiddleware commBridge = null;
     private static final String AGENT_FILE_EXTENSION = ".asl";
 
-    private String policyList;
-    private String ruleList;
-    @Override
-    public void setFirewall(String tipo,String values) {
-        if (tipo.equals("policy")) {
-            this.policyList = values;
-        } else if (tipo.equals("rule")) {
-            this.ruleList = values;
-        } else {
-            System.out.println("deu erro");
+    private List<policy> policyList;
+    private List<rule> ruleList;
+
+    public void setFirewallRule(rule regra) {
+        try {
+            ruleList.add(regra);
+        }catch(Exception e){
+            System.out.println("Deu error para acrescentar na lista de regras");
+        }
+    }
+    public void setFirewallPolicy(policy p) {
+        try {
+            System.out.println(policyList);
+            System.out.println(p);
+            policyList.add(p);
+            System.out.println(policyList);
+        }catch(Exception e){
+            System.out.println("Deu error para acrescentar na lista de politicas");
         }
     }
     @Override
     public String getFirewall(String tipo) {
         if (tipo.equals("policy")) {
-            return this.policyList;
+            return this.policyList.toString();
         } else if (tipo.equals("rule")) {
-            return this.ruleList;
+            return this.ruleList.toString();
         } else {
             return "deu erro";
         }

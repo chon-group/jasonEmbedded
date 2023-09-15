@@ -33,6 +33,8 @@ import jason.mas2j.ClassParameters;
 import jason.profiling.QueryProfiling;
 import jason.runtime.RuntimeServicesInfraTier;
 import jason.runtime.Settings;
+import jason.stdlib.policy;
+import jason.stdlib.rule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -365,7 +367,12 @@ public class AgArch implements AgArchInfraTier, Comparable<AgArch> {
 
     public void connectCN(String gatewayIP, int gatewayPort, String myUUID) {}
 
-    public void setFirewall(String tipo, String teste) {}
+    public void setFirewallPolicy(policy politica) {
+
+    }
+    public void setFirewallRule(rule regra){
+
+    }
 
     public String getFirewall(String tipo) {
         return null;
