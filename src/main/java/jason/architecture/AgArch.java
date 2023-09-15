@@ -371,7 +371,7 @@ public class AgArch implements AgArchInfraTier, Comparable<AgArch> {
     public void setFirewallPolicy(JsonObject politica) {
 
     }
-    public void setFirewallRule(rule regra){
+    public void setFirewallRule(JsonObject regra){
 
     }
     public String getFirewall(String tipo) {

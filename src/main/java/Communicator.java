@@ -25,11 +25,15 @@ public class Communicator extends AgArch {
     private static final String AGENT_FILE_EXTENSION = ".asl";
 
     private JsonArray policyList = new JsonArray();
-    private ArrayList<rule> ruleList;
 
-    public void setFirewallRule(rule regra) {
+    private JsonArray ruleList = new JsonArray();
+
+    public void setFirewallRule(JsonObject r) {
         try {
-            ruleList.add(regra);
+            ruleList.add(r);
+            for(int i=0;i<ruleList.size(); i++) {
+                System.out.println(ruleList.get(i).getAsJsonObject().get("tipo"));
+            }
         }catch(Exception e){
             System.out.println("Deu error para acrescentar na lista de regras");
         }
