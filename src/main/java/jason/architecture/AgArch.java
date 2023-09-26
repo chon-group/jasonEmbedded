@@ -23,6 +23,7 @@
 package jason.architecture;
 
 import br.pro.turing.javino.Javino;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import jason.JasonException;
 import jason.asSemantics.ActionExec;
@@ -374,9 +375,12 @@ public class AgArch implements AgArchInfraTier, Comparable<AgArch> {
     public void setFirewallRule(JsonObject regra){
 
     }
-    public String getFirewall(String tipo) {
+    public JsonArray getFirewall(String tipo) {
         return null;
     }
+
+    public int validarPoliticas(JsonObject mensagem){ return 0;}
+
     public void disconnectCN() {}
 
 }

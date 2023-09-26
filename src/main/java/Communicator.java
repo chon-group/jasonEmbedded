@@ -4,6 +4,7 @@ import jason.AslTransferenceModel;
 import jason.architecture.AgArch;
 import jason.architecture.CommMiddleware;
 import jason.architecture.TransportAgentMessageType;
+import jason.asSemantics.Message;
 import jason.infra.centralised.CentralisedAgArch;
 import jason.infra.centralised.RunCentralisedMAS;
 import jason.mas2j.ClassParameters;
@@ -31,33 +32,70 @@ public class Communicator extends AgArch {
     public void setFirewallRule(JsonObject r) {
         try {
             ruleList.add(r);
-            for(int i=0;i<ruleList.size(); i++) {
-                System.out.println(ruleList.get(i).getAsJsonObject().get("tipo"));
-            }
         }catch(Exception e){
             System.out.println("Deu error para acrescentar na lista de regras");
         }
     }
     public void setFirewallPolicy(JsonObject p) {
         try {
-
             policyList.add(p);
-            for(int i=0;i<policyList.size(); i++) {
-                System.out.println(policyList.get(i).getAsJsonObject().get("tipo"));
-            }
         }catch(Exception e){
             System.out.println("Deu error para acrescentar na lista de politicas");
         }
     }
     @Override
-    public String getFirewall(String tipo) {
+    public JsonArray getFirewall(String tipo) {
         if (tipo.equals("policy")) {
-            return this.policyList.toString();
+            return this.policyList;
         } else if (tipo.equals("rule")) {
-            return this.ruleList.toString();
+            return this.ruleList;
         } else {
-            return "deu erro";
+            return new JsonArray();
         }
+    }
+    @Override
+    public int validarPoliticas(JsonObject mensagem) {
+        JsonArray listaPoliticas = this.getFirewall("policy");
+        int resultado = 0;
+        System.out.println("teste 0");
+        if (listaPoliticas == null) {
+            resultado = 1;
+            System.out.println("teste 1");
+        } else {
+            for (int i = 0; i <= listaPoliticas.size(); i++) {
+                System.out.println("teste 2 do for");
+                if (listaPoliticas.get(i).getAsJsonObject().get("abrangencia").equals("all")) {
+                    System.out.println("teste 3");
+                    if (listaPoliticas.get(i).getAsJsonObject().get("determinacao").equals("accept")) {
+                        System.out.println("teste 4");
+                        resultado = 1;
+                    } else {
+                        resultado = 0;
+                    }
+                } else {
+                    if (listaPoliticas.get(i).getAsJsonObject().get("abrangencia").equals("communication") && mensagem.get("tipoDeMensagem").equals("communication")) {
+                        if (listaPoliticas.get(i).getAsJsonObject().get("determinacao").equals("accept")) {
+                            resultado = 1;
+                        } else {
+                            resultado = 0;
+                        }
+                    } else {
+                        if (listaPoliticas.get(i).getAsJsonObject().get("abrangencia").equals("migration") && mensagem.get("tipoDeMensagem").equals("migration")) {
+                            if (listaPoliticas.get(i).getAsJsonObject().get("determinacao").equals("accept")) {
+                                resultado = 1;
+                            } else {
+                                resultado = 0;
+                            }
+                        } else {
+                            resultado = 0;
+                        }
+                    }
+                }
+            }
+
+        }
+        System.out.println("teste final");
+        return resultado;
     }
     @Override
     public void connectCN(String gatewayIP, int gatewayPort, String myUUID) {

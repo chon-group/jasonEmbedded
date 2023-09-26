@@ -109,6 +109,7 @@ public class CommMiddleware implements NodeConnectionListener {
         }
     }
 
+
     public void reconnected(NodeConnection arg0, SocketAddress arg1, boolean arg2, boolean arg3) {
     }
 
@@ -135,35 +136,33 @@ public class CommMiddleware implements NodeConnectionListener {
      * vinda do protocolo e transformá-las em mensagens do tipo Message do
      * Jason.
      */
-    public JsonObject desenharMensagem(Message message){
+    public JsonObject desenharMensagem(Message message) {
         String mensagem = message.getContentObject().toString();
         JsonObject mensagemJsonObject = new JsonObject();
         int identificador = hex2int(char2int(mensagem.charAt(5)), char2int(mensagem.charAt(4)));
-        if(identificador == 36 ){
-            mensagemJsonObject.addProperty("tipoDeMensagem", "comunicacao");
+        if (identificador == 36) {
+            mensagemJsonObject.addProperty("tipoDeMensagem", "communication");
             mensagemJsonObject.addProperty("UUIDorigem", message.getSenderID().toString());
-            mensagemJsonObject.addProperty("UUIDdestino",message.getRecipientID().toString());
-            int tamanhoForca = hex2int(char2int(mensagem.charAt(43)),char2int(mensagem.charAt(42)));
-            mensagemJsonObject.addProperty("forca", mensagem.substring(44, 44+tamanhoForca));
-            mensagemJsonObject.addProperty("mensagem", mensagem.substring(46+tamanhoForca));
+            mensagemJsonObject.addProperty("UUIDdestino", message.getRecipientID().toString());
+            int tamanhoForca = hex2int(char2int(mensagem.charAt(43)), char2int(mensagem.charAt(42)));
+            mensagemJsonObject.addProperty("forca", mensagem.substring(44, 44 + tamanhoForca));
+            mensagemJsonObject.addProperty("mensagem", mensagem.substring(46 + tamanhoForca));
             return mensagemJsonObject;
-        }else{
-            mensagemJsonObject.addProperty("tipoDeMensagem", "migracao");
+        } else {
+            mensagemJsonObject.addProperty("tipoDeMensagem", "migration");
             mensagemJsonObject.addProperty("UUIDorigem", message.getSenderID().toString());
-            mensagemJsonObject.addProperty("UUIDdestino",message.getRecipientID().toString());
+            mensagemJsonObject.addProperty("UUIDdestino", message.getRecipientID().toString());
             int tamanhoProtocolo = identificador;
-            mensagemJsonObject.addProperty("protocolo", mensagem.substring(6, 6+tamanhoProtocolo));
-            mensagemJsonObject.addProperty("mensagem", mensagem.substring(6+tamanhoProtocolo));
+            mensagemJsonObject.addProperty("protocolo", mensagem.substring(6, 6 + tamanhoProtocolo));
+            mensagemJsonObject.addProperty("mensagem", mensagem.substring(6 + tamanhoProtocolo));
             return mensagemJsonObject;
         }
-
     }
+
     public void newMessageReceived(NodeConnection remoteCon, Message message) {
         JsonObject mensagemJsonObject = desenharMensagem(message);
-        System.out.println(mensagemJsonObject+"\n");
-        // mensagemJsonObject.get("mensagem")
-        //validarRegras(mensagemJsonObject);
-        //validarPoliticas(mensagemJsonObject);
+        int teste = agenteTeste.validarPoliticas(mensagemJsonObject);
+        System.out.println(teste);
         //if( pode executar ) ...
         if (message.getContentObject() instanceof String) {
             this.extractMessageFromContextNet(message.getContentObject().toString().toCharArray());

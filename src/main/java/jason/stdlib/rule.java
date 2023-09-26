@@ -35,7 +35,9 @@ public class rule extends DefaultInternalAction{
         this.protocolo = protocolo;
         this.determinacao = determinacao;
     }
-
+    public void setTeste(int teste){
+        System.out.println("teste");
+    }
     @Override
     public Object execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         if(args.length != 6){
