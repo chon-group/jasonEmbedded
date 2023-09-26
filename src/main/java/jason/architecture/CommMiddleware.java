@@ -2,6 +2,7 @@ package jason.architecture;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import jade.tools.introspector.gui.IntrospectorGUI;
 import jason.AslFileGenerator;
 import jason.AslTransferenceModel;
 import jason.asSyntax.Term;
@@ -137,15 +138,29 @@ public class CommMiddleware implements NodeConnectionListener {
     public JsonObject desenharMensagem(Message message){
         String mensagem = message.getContentObject().toString();
         JsonObject mensagemJsonObject = new JsonObject();
-        mensagemJsonObject.addProperty("UUIDorigem", message.getSenderID().toString());
-        mensagemJsonObject.addProperty("UUIDdestino",message.getRecipientID().toString());
-        int tamanhoForca = Integer.parseInt(mensagem.substring(42,44));
-        mensagemJsonObject.addProperty("forca", mensagem.substring(44, 44+tamanhoForca));
-        mensagemJsonObject.addProperty("mensagem", mensagem.substring(46+tamanhoForca));
-        return mensagemJsonObject;
+        int identificador = hex2int(char2int(mensagem.charAt(5)), char2int(mensagem.charAt(4)));
+        if(identificador == 36 ){
+            mensagemJsonObject.addProperty("tipoDeMensagem", "comunicacao");
+            mensagemJsonObject.addProperty("UUIDorigem", message.getSenderID().toString());
+            mensagemJsonObject.addProperty("UUIDdestino",message.getRecipientID().toString());
+            int tamanhoForca = hex2int(char2int(mensagem.charAt(43)),char2int(mensagem.charAt(42)));
+            mensagemJsonObject.addProperty("forca", mensagem.substring(44, 44+tamanhoForca));
+            mensagemJsonObject.addProperty("mensagem", mensagem.substring(46+tamanhoForca));
+            return mensagemJsonObject;
+        }else{
+            mensagemJsonObject.addProperty("tipoDeMensagem", "migracao");
+            mensagemJsonObject.addProperty("UUIDorigem", message.getSenderID().toString());
+            mensagemJsonObject.addProperty("UUIDdestino",message.getRecipientID().toString());
+            int tamanhoProtocolo = identificador;
+            mensagemJsonObject.addProperty("protocolo", mensagem.substring(6, 6+tamanhoProtocolo));
+            mensagemJsonObject.addProperty("mensagem", mensagem.substring(6+tamanhoProtocolo));
+            return mensagemJsonObject;
+        }
+
     }
     public void newMessageReceived(NodeConnection remoteCon, Message message) {
         JsonObject mensagemJsonObject = desenharMensagem(message);
+        System.out.println(mensagemJsonObject+"\n");
         // mensagemJsonObject.get("mensagem")
         //validarRegras(mensagemJsonObject);
         //validarPoliticas(mensagemJsonObject);
@@ -527,62 +542,6 @@ public class CommMiddleware implements NodeConnectionListener {
     private int hex2int(int x, int y) {
         int converted = x + (y * 16);
         return converted;
-    }
-    public String hex2dec(String hexa) {
-
-        int size = hexa.length();
-        int result = 0;
-
-        for (int i = 0; i < hexa.length(); i++) {
-            switch (hexa.charAt(i)) {
-                case '1':
-                    result += (1 * Math.pow(16, --size));
-                    break;
-                case '2':
-                    result += (2 * Math.pow(16, --size));
-                    break;
-                case '3':
-                    result += (3 * Math.pow(16, --size));
-                    break;
-                case '4':
-                    result += (4 * Math.pow(16, --size));
-                    break;
-                case '5':
-                    result += (5 * Math.pow(16, --size));
-                    break;
-                case '6':
-                    result += (6 * Math.pow(16, --size));
-                    break;
-                case '7':
-                    result += (7 * Math.pow(16, --size));
-                    break;
-                case '8':
-                    result += (8 * Math.pow(16, --size));
-                    break;
-                case '9':
-                    result += (9 * Math.pow(16, --size));
-                    break;
-                case 'A':
-                    result += (10 * Math.pow(16, --size));
-                    break;
-                case 'B':
-                    result += (11 * Math.pow(16, --size));
-                    break;
-                case 'C':
-                    result += (12 * Math.pow(16, --size));
-                    break;
-                case 'D':
-                    result += (13 * Math.pow(16, --size));
-                    break;
-                case 'E':
-                    result += (14 * Math.pow(16, --size));
-                    break;
-                case 'F':
-                    result += (15 * Math.pow(16, --size));
-            }
-        }
-
-        return String.valueOf(result);
     }
 
 }
