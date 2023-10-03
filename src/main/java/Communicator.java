@@ -54,52 +54,8 @@ public class Communicator extends AgArch {
         }
     }
     @Override
-    public int validarPoliticas(JsonObject mensagem) {
-        JsonArray listaPoliticas = this.getFirewall("policy");
-        int resultado = 0;
-        System.out.println("teste 0");
-        if (listaPoliticas == null) {
-            resultado = 1;
-            System.out.println("teste 1");
-        } else {
-            for (int i = 0; i <= listaPoliticas.size(); i++) {
-                System.out.println("teste 2 do for");
-                if (listaPoliticas.get(i).getAsJsonObject().get("abrangencia").equals("all")) {
-                    System.out.println("teste 3");
-                    if (listaPoliticas.get(i).getAsJsonObject().get("determinacao").equals("accept")) {
-                        System.out.println("teste 4");
-                        resultado = 1;
-                    } else {
-                        resultado = 0;
-                    }
-                } else {
-                    if (listaPoliticas.get(i).getAsJsonObject().get("abrangencia").equals("communication") && mensagem.get("tipoDeMensagem").equals("communication")) {
-                        if (listaPoliticas.get(i).getAsJsonObject().get("determinacao").equals("accept")) {
-                            resultado = 1;
-                        } else {
-                            resultado = 0;
-                        }
-                    } else {
-                        if (listaPoliticas.get(i).getAsJsonObject().get("abrangencia").equals("migration") && mensagem.get("tipoDeMensagem").equals("migration")) {
-                            if (listaPoliticas.get(i).getAsJsonObject().get("determinacao").equals("accept")) {
-                                resultado = 1;
-                            } else {
-                                resultado = 0;
-                            }
-                        } else {
-                            resultado = 0;
-                        }
-                    }
-                }
-            }
-
-        }
-        System.out.println("teste final");
-        return resultado;
-    }
-    @Override
     public void connectCN(String gatewayIP, int gatewayPort, String myUUID) {
-        this.commBridge = new CommMiddleware(gatewayIP, gatewayPort, myUUID);
+        this.commBridge = new CommMiddleware(gatewayIP, gatewayPort, myUUID,getFirewall("policy"), getFirewall("rule"));
         this.commBridge.setAgName(this.getAgName());
     }
 

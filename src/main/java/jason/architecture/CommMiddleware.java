@@ -54,8 +54,15 @@ public class CommMiddleware implements NodeConnectionListener {
 
     private static final String COMMUNICATOR_SIZE_MESSAGE_DEFINITION = "ss";
 
-    public CommMiddleware(String gatewayIP, int gatewayPort, String myUUID) {
+
+    private JsonArray policyList;
+
+    private JsonArray ruleList;
+
+    public CommMiddleware(String gatewayIP, int gatewayPort, String myUUID, JsonArray policy, JsonArray rule) {
         this.myUUID = myUUID;
+        this.policyList = policy;
+        this.ruleList = rule;
         UUID uuid = UUID.fromString(myUUID);
         InetSocketAddress address = new InetSocketAddress(gatewayIP, gatewayPort);
         try {
@@ -158,108 +165,169 @@ public class CommMiddleware implements NodeConnectionListener {
             return mensagemJsonObject;
         }
     }
-
-    public void newMessageReceived(NodeConnection remoteCon, Message message) {
-        JsonObject mensagemJsonObject = desenharMensagem(message);
-        int teste = agenteTeste.validarPoliticas(mensagemJsonObject);
-        System.out.println(teste);
-        //if( pode executar ) ...
-        if (message.getContentObject() instanceof String) {
-            this.extractMessageFromContextNet(message.getContentObject().toString().toCharArray());
-
-            // Verifica se há algo relacionado à transferência de agentes para responder a quem enviou a solicitação
-            // de transferência de agentes.
-            if (this.answerToSendAboutTransfer != null && !this.answerToSendAboutTransfer.equals(EMPTY_VALUE)
-                    && this.answerToSendAboutTransfer.equals(TransportAgentMessageType.CAN_TRANSFER.getName())) {
-                ApplicationMessage appMessage = new ApplicationMessage();
-                appMessage.setContentObject(prepareToSend(this.answerToSendAboutTransfer));
-                appMessage.setRecipientID(message.getSenderID());
-                try {
-                    this.connection.sendMessage(appMessage);
-                } catch (IOException e) {
-                    e.printStackTrace();
+    public int validarPoliticas(JsonObject mensagem) {
+        int resultado = 0;
+        if (this.policyList.size() == 0) {
+            resultado = 1;
+        } else {
+            for (int i = 0; i < this.policyList.size(); i++) {
+                if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all") && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept") && this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")) {
+                    resultado = 1;
+                } else if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all") && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                    resultado = 0;
+                }
+                if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication") && mensagem.get("tipoDeMensagem").getAsString().equals("communication") && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                    resultado = 1;
+                } else if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication") && mensagem.get("tipoDeMensagem").getAsString().equals("communication") && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                    resultado = 0;
+                }
+                if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration") && mensagem.get("tipoDeMensagem").getAsString().equals("migration") && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                    resultado = 1;
+                } else if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration") && mensagem.get("tipoDeMensagem").getAsString().equals("migration") && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                    resultado = 0;
                 }
             }
-            if (this.replySentAboutTransfer != null && !this.replySentAboutTransfer.equals(EMPTY_VALUE)
-                    && this.replySentAboutTransfer.equals(TransportAgentMessageType.CAN_TRANSFER.getName())) {
-                Map<String, CentralisedAgArch> agentsOfTheSMA = RunCentralisedMAS.getRunner().getAgs();
-                ArrayList<AslTransferenceModel> aslTransferenceModelList = new ArrayList<AslTransferenceModel>();
-                int qtdAgents = 0;
-                for (CentralisedAgArch centralisedAgArch : agentsOfTheSMA.values()) {
-                    if (this.nameAgents.contains(centralisedAgArch.getAgName())) {
-                        AslFileGenerator aslFileGenerator = new AslFileGenerator();
-                        AslTransferenceModel aslTransferenceModel;
-                        if (TransportAgentMessageType.INQUILINISM.getName().equalsIgnoreCase(this.getProtocol())) {
-                            aslTransferenceModel = aslFileGenerator.generateAslContentWithoutIntentions(
-                                    centralisedAgArch.getUserAgArch());
-                        } else {
-                            aslTransferenceModel = aslFileGenerator.generateAslContent(
-                                    centralisedAgArch.getUserAgArch());
-                        }
-
-                        aslTransferenceModelList.add(aslTransferenceModel);
-                        qtdAgents++;
+        }
+        return resultado;
+    }
+    public int validarRegras(JsonObject mensagem) {
+        int resultado = 0;
+        int contador = 0;
+        System.out.println(this.ruleList.get(0).getAsJsonObject().get("origem").getAsString());
+        if (this.ruleList.size() == 0) {
+            resultado = this.validarPoliticas(mensagem);
+        } else {
+            for (int i = 0; i < this.ruleList.size(); i++) {
+                if (this.ruleList.get(i).getAsJsonObject().get("origem").getAsString().equals(mensagem.get("UUIDorigem").toString())) {
+                    contador += 1;
+                    if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                        resultado = 1;
+                    } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                        resultado = 0;
+                    }
+                    if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication") && mensagem.get("tipoDeMensagem").getAsString().equals("communication") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                        resultado = 1;
+                    } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication") && mensagem.get("tipoDeMensagem").getAsString().equals("communication") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                        resultado = 0;
+                    }
+                    if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration") && mensagem.get("tipoDeMensagem").getAsString().equals("migration") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                        resultado = 1;
+                    } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration") && mensagem.get("tipoDeMensagem").getAsString().equals("migration") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                        resultado = 0;
                     }
                 }
+            }
+        }
+        if(contador == 0){
+            resultado = this.validarPoliticas(mensagem);
+        }
+        return resultado;
+    }
+    public void newMessageReceived(NodeConnection remoteCon, Message message) {
+        JsonObject mensagemJsonObject = desenharMensagem(message);
+        int teste = this.validarRegras(mensagemJsonObject);
+        System.out.println("Resultado final: " +teste);
 
-                // Verificando se a quantidade de agentes está de acordo com o que se deseja enviar.
-                if (qtdAgents == this.nameAgents.size()) {
+        if(teste == 0){
+            System.out.println("O agente nao tem permissao para executar a acao");
+        }else {
+            if (message.getContentObject() instanceof String) {
+                this.extractMessageFromContextNet(message.getContentObject().toString().toCharArray());
+
+                // Verifica se há algo relacionado à transferência de agentes para responder a quem enviou a solicitação
+                // de transferência de agentes.
+                if (this.answerToSendAboutTransfer != null && !this.answerToSendAboutTransfer.equals(EMPTY_VALUE)
+                        && this.answerToSendAboutTransfer.equals(TransportAgentMessageType.CAN_TRANSFER.getName())) {
                     ApplicationMessage appMessage = new ApplicationMessage();
-                    appMessage.setContentObject(aslTransferenceModelList);
+                    appMessage.setContentObject(prepareToSend(this.answerToSendAboutTransfer));
                     appMessage.setRecipientID(message.getSenderID());
                     try {
                         this.connection.sendMessage(appMessage);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                } else {
-                    System.err.println("[ERRO]: Não é possível realizar a transferência porque a quantidade de "
-                            + "agentes esperados para envio não foi satisfeita.");
                 }
-            }
-            if (this.replySentAboutTransfer != null && !this.replySentAboutTransfer.equals(EMPTY_VALUE)
-                    && this.replySentAboutTransfer.equals(TransportAgentMessageType.CAN_KILL.getName())) {
-                //Deletar os arquivos ASL
-                Map<String, CentralisedAgArch> agentsOfTheSMA = RunCentralisedMAS.getRunner().getAgs();
-                for (CentralisedAgArch centralisedAgArch : agentsOfTheSMA.values()) {
-                    if (this.nameAgents.contains(centralisedAgArch.getAgName())) {
-                        String path = centralisedAgArch.getTS().getAg().getASLSrc();
-                        File file = new File(path);
-                        this.deleteFileAsl(file);
-                    }
-                }
-            }
-        } else if (message.getContentObject() instanceof ArrayList) {
-            // Recebi os agentes
-            AslFileGenerator aslFileGenerator = new AslFileGenerator();
-            ArrayList<AslTransferenceModel> aslTransferenceModelArrayList = (ArrayList<AslTransferenceModel>) message
-                    .getContentObject();
-            int qtdAgentsReceived = 0;
-            for (AslTransferenceModel aslTransferenceModel : aslTransferenceModelArrayList) {
-                if (this.nameAgents.contains(aslTransferenceModel.getName())) {
-                    // Descobrindo o path que os agentes devem ser criados.
-                    String path = EMPTY_VALUE;
-                    for (CentralisedAgArch centralisedAgArch : RunCentralisedMAS.getRunner().getAgs().values()) {
-                        path = centralisedAgArch.getTS().getAg().getASLSrc();
-                        path = path.substring(0, path.length() - (centralisedAgArch.getAgName()
-                                + AGENT_FILE_EXTENSION).length());
-                        break;
-                    }
-                    aslFileGenerator.createAslFile(path, aslTransferenceModel);
-                    qtdAgentsReceived++;
-                }
-            }
+                if (this.replySentAboutTransfer != null && !this.replySentAboutTransfer.equals(EMPTY_VALUE)
+                        && this.replySentAboutTransfer.equals(TransportAgentMessageType.CAN_TRANSFER.getName())) {
+                    Map<String, CentralisedAgArch> agentsOfTheSMA = RunCentralisedMAS.getRunner().getAgs();
+                    ArrayList<AslTransferenceModel> aslTransferenceModelList = new ArrayList<AslTransferenceModel>();
+                    int qtdAgents = 0;
+                    for (CentralisedAgArch centralisedAgArch : agentsOfTheSMA.values()) {
+                        if (this.nameAgents.contains(centralisedAgArch.getAgName())) {
+                            AslFileGenerator aslFileGenerator = new AslFileGenerator();
+                            AslTransferenceModel aslTransferenceModel;
+                            if (TransportAgentMessageType.INQUILINISM.getName().equalsIgnoreCase(this.getProtocol())) {
+                                aslTransferenceModel = aslFileGenerator.generateAslContentWithoutIntentions(
+                                        centralisedAgArch.getUserAgArch());
+                            } else {
+                                aslTransferenceModel = aslFileGenerator.generateAslContent(
+                                        centralisedAgArch.getUserAgArch());
+                            }
 
-            if (qtdAgentsReceived == this.nameAgents.size()) {
-                // Todos agentes recebidos com sucesso.
-                this.answerToSendAboutTransfer = TransportAgentMessageType.CAN_KILL.getName();
-                this.senderUUID = message.getSenderID();
-                this.agentsReceived = aslTransferenceModelArrayList;
+                            aslTransferenceModelList.add(aslTransferenceModel);
+                            qtdAgents++;
+                        }
+                    }
+
+                    // Verificando se a quantidade de agentes está de acordo com o que se deseja enviar.
+                    if (qtdAgents == this.nameAgents.size()) {
+                        ApplicationMessage appMessage = new ApplicationMessage();
+                        appMessage.setContentObject(aslTransferenceModelList);
+                        appMessage.setRecipientID(message.getSenderID());
+                        try {
+                            this.connection.sendMessage(appMessage);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        System.err.println("[ERRO]: Não é possível realizar a transferência porque a quantidade de "
+                                + "agentes esperados para envio não foi satisfeita.");
+                    }
+                }
+                if (this.replySentAboutTransfer != null && !this.replySentAboutTransfer.equals(EMPTY_VALUE)
+                        && this.replySentAboutTransfer.equals(TransportAgentMessageType.CAN_KILL.getName())) {
+                    //Deletar os arquivos ASL
+                    Map<String, CentralisedAgArch> agentsOfTheSMA = RunCentralisedMAS.getRunner().getAgs();
+                    for (CentralisedAgArch centralisedAgArch : agentsOfTheSMA.values()) {
+                        if (this.nameAgents.contains(centralisedAgArch.getAgName())) {
+                            String path = centralisedAgArch.getTS().getAg().getASLSrc();
+                            File file = new File(path);
+                            this.deleteFileAsl(file);
+                        }
+                    }
+                }
+            } else if (message.getContentObject() instanceof ArrayList) {
+                // Recebi os agentes
+                AslFileGenerator aslFileGenerator = new AslFileGenerator();
+                ArrayList<AslTransferenceModel> aslTransferenceModelArrayList = (ArrayList<AslTransferenceModel>) message
+                        .getContentObject();
+                int qtdAgentsReceived = 0;
+                for (AslTransferenceModel aslTransferenceModel : aslTransferenceModelArrayList) {
+                    if (this.nameAgents.contains(aslTransferenceModel.getName())) {
+                        // Descobrindo o path que os agentes devem ser criados.
+                        String path = EMPTY_VALUE;
+                        for (CentralisedAgArch centralisedAgArch : RunCentralisedMAS.getRunner().getAgs().values()) {
+                            path = centralisedAgArch.getTS().getAg().getASLSrc();
+                            path = path.substring(0, path.length() - (centralisedAgArch.getAgName()
+                                    + AGENT_FILE_EXTENSION).length());
+                            break;
+                        }
+                        aslFileGenerator.createAslFile(path, aslTransferenceModel);
+                        qtdAgentsReceived++;
+                    }
+                }
+
+                if (qtdAgentsReceived == this.nameAgents.size()) {
+                    // Todos agentes recebidos com sucesso.
+                    this.answerToSendAboutTransfer = TransportAgentMessageType.CAN_KILL.getName();
+                    this.senderUUID = message.getSenderID();
+                    this.agentsReceived = aslTransferenceModelArrayList;
+                } else {
+                    System.out.println("Qtd: " + qtdAgentsReceived + "\tQtdNames: " + this.nameAgents.size());
+                }
             } else {
-                System.out.println("Qtd: " + qtdAgentsReceived + "\tQtdNames: " + this.nameAgents.size());
+                System.err.println("Error: Getting the object content in the ContextNet communication");
             }
-        } else {
-            System.err.println("Error: Getting the object content in the ContextNet communication");
         }
         //System.out.println("[ARGO]: A Message has arrived: " + message.getContentObject().toString());
     }
