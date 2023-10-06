@@ -143,28 +143,49 @@ public class CommMiddleware implements NodeConnectionListener {
      * vinda do protocolo e transformá-las em mensagens do tipo Message do
      * Jason.
      */
-    public JsonObject desenharMensagem(Message message) {
+    public JsonObject desenharMensagem(Message message, String tipo) {
         String mensagem = message.getContentObject().toString();
         JsonObject mensagemJsonObject = new JsonObject();
         int identificador = hex2int(char2int(mensagem.charAt(5)), char2int(mensagem.charAt(4)));
         if (identificador == 36) {
-            mensagemJsonObject.addProperty("tipoDeMensagem", "communication");
-            mensagemJsonObject.addProperty("UUIDorigem", message.getSenderID().toString());
-            mensagemJsonObject.addProperty("UUIDdestino", message.getRecipientID().toString());
+            mensagemJsonObject.addProperty("tipo", tipo);
+            mensagemJsonObject.addProperty("abrangencia", "communication");
+            mensagemJsonObject.addProperty("endereco", message.getSenderID().toString());
+            //mensagemJsonObject.addProperty("UUIDdestino", message.getRecipientID().toString());
             int tamanhoForca = hex2int(char2int(mensagem.charAt(43)), char2int(mensagem.charAt(42)));
             mensagemJsonObject.addProperty("forca", mensagem.substring(44, 44 + tamanhoForca));
             mensagemJsonObject.addProperty("mensagem", mensagem.substring(46 + tamanhoForca));
             return mensagemJsonObject;
         } else {
             mensagemJsonObject.addProperty("tipoDeMensagem", "migration");
-            mensagemJsonObject.addProperty("UUIDorigem", message.getSenderID().toString());
-            mensagemJsonObject.addProperty("UUIDdestino", message.getRecipientID().toString());
+            mensagemJsonObject.addProperty("endereco", message.getSenderID().toString());
+            //mensagemJsonObject.addProperty("UUIDdestino", message.getRecipientID().toString());
             int tamanhoProtocolo = identificador;
             mensagemJsonObject.addProperty("protocolo", mensagem.substring(6, 6 + tamanhoProtocolo));
             mensagemJsonObject.addProperty("mensagem", mensagem.substring(6 + tamanhoProtocolo));
             return mensagemJsonObject;
         }
     }
+
+    public JsonObject desenharMensagem(String tipo, String abrangencia, String sender, String receiver, Term force, Term msg) {
+        JsonObject mensagemJsonObject = new JsonObject();
+        mensagemJsonObject.addProperty("tipo", tipo);
+        mensagemJsonObject.addProperty("abrangencia", abrangencia);
+        mensagemJsonObject.addProperty("endereco", sender);
+        //mensagemJsonObject.addProperty("UUIDdestino", receiver.substring(1, receiver.length() - 2));
+        mensagemJsonObject.addProperty("forca", force.toString());
+        mensagemJsonObject.addProperty("mensagem", msg.toString());
+        return mensagemJsonObject;
+    }
+    public JsonObject desenharMensagem(String tipo, String abrangencia, String receiver) {
+        JsonObject mensagemJsonObject = new JsonObject();
+        mensagemJsonObject.addProperty("tipo", tipo);
+        mensagemJsonObject.addProperty("abrangencia", abrangencia);
+        mensagemJsonObject.addProperty("endereco", receiver.substring(1, receiver.length() - 2));
+        return mensagemJsonObject;
+    }
+
+
     public int validarPoliticas(JsonObject mensagem) {
         int resultado = 0;
         if (this.policyList.size() == 0) {
@@ -190,47 +211,50 @@ public class CommMiddleware implements NodeConnectionListener {
         }
         return resultado;
     }
+
     public int validarRegras(JsonObject mensagem) {
         int resultado = 0;
         int contador = 0;
-        System.out.println(this.ruleList.get(0).getAsJsonObject().get("origem").getAsString());
         if (this.ruleList.size() == 0) {
             resultado = this.validarPoliticas(mensagem);
         } else {
             for (int i = 0; i < this.ruleList.size(); i++) {
-                if (this.ruleList.get(i).getAsJsonObject().get("origem").getAsString().equals(mensagem.get("UUIDorigem").toString())) {
-                    contador += 1;
-                    if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
-                        resultado = 1;
-                    } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
-                        resultado = 0;
-                    }
-                    if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication") && mensagem.get("tipoDeMensagem").getAsString().equals("communication") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
-                        resultado = 1;
-                    } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication") && mensagem.get("tipoDeMensagem").getAsString().equals("communication") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
-                        resultado = 0;
-                    }
-                    if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration") && mensagem.get("tipoDeMensagem").getAsString().equals("migration") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
-                        resultado = 1;
-                    } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration") && mensagem.get("tipoDeMensagem").getAsString().equals("migration") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
-                        resultado = 0;
+                if (this.ruleList.get(i).getAsJsonObject().get("tipo").getAsString().equals(mensagem.get("tipo").getAsString())) {
+                    if (this.ruleList.get(i).getAsJsonObject().get("endereco").getAsString().equals(mensagem.get("endereco").toString())) {
+                        contador += 1;
+                        if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                            resultado = 1;
+                        } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                            resultado = 0;
+                        }
+                        if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication") && mensagem.get("tipoDeMensagem").getAsString().equals("communication") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                            resultado = 1;
+                        } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication") && mensagem.get("tipoDeMensagem").getAsString().equals("communication") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                            resultado = 0;
+                        }
+                        if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration") && mensagem.get("tipoDeMensagem").getAsString().equals("migration") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                            resultado = 1;
+                        } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration") && mensagem.get("tipoDeMensagem").getAsString().equals("migration") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                            resultado = 0;
+                        }
                     }
                 }
             }
         }
-        if(contador == 0){
+        if (contador == 0) {
             resultado = this.validarPoliticas(mensagem);
         }
         return resultado;
     }
-    public void newMessageReceived(NodeConnection remoteCon, Message message) {
-        JsonObject mensagemJsonObject = desenharMensagem(message);
-        int teste = this.validarRegras(mensagemJsonObject);
-        System.out.println("Resultado final: " +teste);
 
-        if(teste == 0){
-            System.out.println("O agente nao tem permissao para executar a acao");
-        }else {
+    public void newMessageReceived(NodeConnection remoteCon, Message message) {
+        String tipo = "input";
+        JsonObject mensagemJsonObject = desenharMensagem(message, tipo);
+        int resultado = this.validarRegras(mensagemJsonObject);
+        System.out.println(mensagemJsonObject);
+        if (resultado == 0) {
+            System.out.println("O agente nao tem permissao para executar a acao de entrada");
+        } else {
             if (message.getContentObject() instanceof String) {
                 this.extractMessageFromContextNet(message.getContentObject().toString().toCharArray());
 
@@ -448,7 +472,7 @@ public class CommMiddleware implements NodeConnectionListener {
     /**
      * Trata as mensagens de sendOut do agente Communicator.
      *
-     * @param sender Parâmetro que indica o agente que está enviando a mensagem.
+     * @param sender  Parâmetro que indica o agente que está enviando a mensagem.
      * @param message Mensagem enviada.
      */
     private void treatSendOutMessage(String sender, char[] message) {
@@ -475,43 +499,73 @@ public class CommMiddleware implements NodeConnectionListener {
     }
 
     public void sendMsgToContextNet(String sender, String receiver, Term force, Term msg) {
-        ApplicationMessage message = new ApplicationMessage();
-        message.setContentObject(this.prepareToSend(sender, force.toString(), msg.toString()));
-        message.setRecipientID(UUID.fromString(receiver.substring(1, receiver.length() - 1)));
-        try {
-            this.connection.sendMessage(message);
-        } catch (IOException e) {
-            e.printStackTrace();
+        String tipo = "output";
+        String abrangencia = "communcation";
+
+        JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, sender, receiver, force, msg);
+        System.out.println(mensagemJsonObject);
+        int resultado = this.validarRegras(mensagemJsonObject);
+        if (resultado == 0) {
+            System.out.println("O agente nao tem permissao para executar a acao de sendOUT");
+        } else {
+            ApplicationMessage message = new ApplicationMessage();
+            message.setContentObject(this.prepareToSend(sender, force.toString(), msg.toString()));
+            message.setRecipientID(UUID.fromString(receiver.substring(1, receiver.length() - 1)));
+            try {
+                this.connection.sendMessage(message);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public void sendAllAgentsToContextNet(String receiver, Term protocol, List<String> nameAgents) {
-        ApplicationMessage message = new ApplicationMessage();
-        this.nameAgents = new ArrayList<String>();
-        this.nameAgents.addAll(nameAgents);
-        message.setContentObject(this.prepareToSend(protocol.toString().toUpperCase().trim(), nameAgents));
-        message.setRecipientID(UUID.fromString(receiver.substring(1, receiver.length() - 1)));
-        try {
-            this.connection.sendMessage(message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String tipo = "output";
+        String abrangencia = "migration";
 
+        JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, receiver);
+        System.out.println(mensagemJsonObject);
+        int resultado = this.validarRegras(mensagemJsonObject);
+        if (resultado == 0) {
+            System.out.println("O agente nao tem permissao para executar a acao de moveOUT");
+        } else {
+            ApplicationMessage message = new ApplicationMessage();
+            this.nameAgents = new ArrayList<String>();
+            this.nameAgents.addAll(nameAgents);
+            message.setContentObject(this.prepareToSend(protocol.toString().toUpperCase().trim(), nameAgents));
+            message.setRecipientID(UUID.fromString(receiver.substring(1, receiver.length() - 1)));
+            try {
+                this.connection.sendMessage(message);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
+
 
     public void sendAgentToContextNet(String receiver, Term protocol, Term agent) {
-        ApplicationMessage message = new ApplicationMessage();
-        this.nameAgents = new ArrayList<String>();
-        this.nameAgents.add(agent.toString());
-        message.setContentObject(this.prepareToSend(protocol.toString().toUpperCase().trim(), agent.toString()));
-        message.setRecipientID(UUID.fromString(receiver.substring(1, receiver.length() - 1)));
-        try {
-            this.connection.sendMessage(message);
-        } catch (IOException e) {
-            e.printStackTrace();
+        String tipo = "output";
+        String abrangencia = "migration";
+
+        JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, receiver);
+        System.out.println(mensagemJsonObject);
+        int resultado = this.validarRegras(mensagemJsonObject);
+        if (resultado == 0) {
+            System.out.println("O agente nao tem permissao para executar a acao de moveOUT");
+        } else {
+            ApplicationMessage message = new ApplicationMessage();
+            this.nameAgents = new ArrayList<String>();
+            this.nameAgents.add(agent.toString());
+            message.setContentObject(this.prepareToSend(protocol.toString().toUpperCase().trim(), agent.toString()));
+            message.setRecipientID(UUID.fromString(receiver.substring(1, receiver.length() - 1)));
+            try {
+                this.connection.sendMessage(message);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
-
     public void sendMsgToDeleteAllAgents() {
         ApplicationMessage appMessage = new ApplicationMessage();
         appMessage.setContentObject(this.prepareToSend(this.answerToSendAboutTransfer));
