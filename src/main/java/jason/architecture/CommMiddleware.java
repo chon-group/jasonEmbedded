@@ -157,6 +157,7 @@ public class CommMiddleware implements NodeConnectionListener {
             mensagemJsonObject.addProperty("mensagem", mensagem.substring(46 + tamanhoForca));
             return mensagemJsonObject;
         } else {
+            mensagemJsonObject.addProperty("tipo", tipo);
             mensagemJsonObject.addProperty("abrangencia", "migration");
             mensagemJsonObject.addProperty("endereco", message.getSenderID().toString());
             //mensagemJsonObject.addProperty("UUIDdestino", message.getRecipientID().toString());
@@ -167,7 +168,7 @@ public class CommMiddleware implements NodeConnectionListener {
         }
     }
 
-    public JsonObject desenharMensagem(String tipo, String abrangencia, String sender, String receiver, Term force, Term msg) {
+    public JsonObject desenharMensagem(String tipo, String abrangencia, String sender, Term force, Term msg) {
         JsonObject mensagemJsonObject = new JsonObject();
         mensagemJsonObject.addProperty("tipo", tipo);
         mensagemJsonObject.addProperty("abrangencia", abrangencia);
@@ -179,35 +180,48 @@ public class CommMiddleware implements NodeConnectionListener {
     }
     public JsonObject desenharMensagem(String tipo, String abrangencia, String receiver) {
         JsonObject mensagemJsonObject = new JsonObject();
+        System.out.println("TIPO:" + tipo);
+        System.out.println("ABRANGENCIA:" + abrangencia);
+        System.out.println("ENDERECO: " + receiver.substring(1, receiver.length() - 1));
         mensagemJsonObject.addProperty("tipo", tipo);
         mensagemJsonObject.addProperty("abrangencia", abrangencia);
-        mensagemJsonObject.addProperty("endereco", receiver.substring(1, receiver.length() - 2));
+        mensagemJsonObject.addProperty("endereco", receiver.substring(1, receiver.length() - 1));
         return mensagemJsonObject;
     }
 
 
     public int validarPoliticas(JsonObject mensagem) {
         int resultado = 0;
+        int contador = 0;
         if (this.policyList.size() == 0) {
             resultado = 1;
         } else {
             for (int i = 0; i < this.policyList.size(); i++) {
                 if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all") && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept") && this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")) {
+                    contador += 1;
                     resultado = 1;
                 } else if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all") && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                    contador += 1;
                     resultado = 0;
                 }
                 if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication") && mensagem.get("abrangencia").getAsString().equals("communication") && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                    contador += 1;
                     resultado = 1;
                 } else if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication") && mensagem.get("abrangencia").getAsString().equals("communication") && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                    contador += 1;
                     resultado = 0;
                 }
                 if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration") && mensagem.get("abrangencia").getAsString().equals("migration") && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                    contador += 1;
                     resultado = 1;
                 } else if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration") && mensagem.get("abrangencia").getAsString().equals("migration") && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                    contador += 1;
                     resultado = 0;
                 }
             }
+        }
+        if(contador == 0){
+            resultado = 1;
         }
         return resultado;
     }
@@ -215,6 +229,7 @@ public class CommMiddleware implements NodeConnectionListener {
     public int validarRegras(JsonObject mensagem) {
         int resultado = 0;
         int contador = 0;
+
         if (this.ruleList.size() == 0) {
             resultado = this.validarPoliticas(mensagem);
         } else {
@@ -251,7 +266,6 @@ public class CommMiddleware implements NodeConnectionListener {
         String tipo = "input";
         JsonObject mensagemJsonObject = desenharMensagem(message, tipo);
         int resultado = this.validarRegras(mensagemJsonObject);
-        System.out.println(mensagemJsonObject);
         if (resultado == 0) {
             System.out.println("O agente nao tem permissao para executar a acao de entrada");
         } else {
@@ -502,8 +516,8 @@ public class CommMiddleware implements NodeConnectionListener {
         String tipo = "output";
         String abrangencia = "communication";
 
-        JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, sender, receiver, force, msg);
-        System.out.println(mensagemJsonObject);
+        JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, sender, force, msg);
+        System.out.println("JSON OBJECT DO SENDMSG: " +mensagemJsonObject);
         int resultado = this.validarRegras(mensagemJsonObject);
         if (resultado == 0) {
             System.out.println("O agente nao tem permissao para executar a acao de sendOUT");
@@ -524,7 +538,7 @@ public class CommMiddleware implements NodeConnectionListener {
         String abrangencia = "migration";
 
         JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, receiver);
-        System.out.println(mensagemJsonObject);
+        System.out.println("JSON OBJECT DO SENDALL:  " +mensagemJsonObject);
         int resultado = this.validarRegras(mensagemJsonObject);
         if (resultado == 0) {
             System.out.println("O agente nao tem permissao para executar a acao de moveOUT");
@@ -549,7 +563,7 @@ public class CommMiddleware implements NodeConnectionListener {
         String abrangencia = "migration";
 
         JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, receiver);
-        System.out.println(mensagemJsonObject);
+        System.out.println("JSON OBJECT DO SEND AGENT: " +mensagemJsonObject);
         int resultado = this.validarRegras(mensagemJsonObject);
         if (resultado == 0) {
             System.out.println("O agente nao tem permissao para executar a acao de moveOUT");
