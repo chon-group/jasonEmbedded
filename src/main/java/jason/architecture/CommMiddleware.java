@@ -151,7 +151,7 @@ public class CommMiddleware implements NodeConnectionListener {
             mensagemJsonObject.addProperty("tipo", tipo);
             mensagemJsonObject.addProperty("abrangencia", "communication");
             mensagemJsonObject.addProperty("endereco", message.getSenderID().toString());
-            //mensagemJsonObject.addProperty("UUIDdestino", message.getRecipientID().toString());
+            mensagemJsonObject.addProperty("protocolo", "kqml");
             int tamanhoForca = hex2int(char2int(mensagem.charAt(43)), char2int(mensagem.charAt(42)));
             mensagemJsonObject.addProperty("forca", mensagem.substring(44, 44 + tamanhoForca));
             mensagemJsonObject.addProperty("mensagem", mensagem.substring(46 + tamanhoForca));
@@ -160,7 +160,7 @@ public class CommMiddleware implements NodeConnectionListener {
             mensagemJsonObject.addProperty("tipo", tipo);
             mensagemJsonObject.addProperty("abrangencia", "migration");
             mensagemJsonObject.addProperty("endereco", message.getSenderID().toString());
-            //mensagemJsonObject.addProperty("UUIDdestino", message.getRecipientID().toString());
+            mensagemJsonObject.addProperty("protocolo", "bioinsp");
             int tamanhoProtocolo = identificador;
             mensagemJsonObject.addProperty("forca", mensagem.substring(6, 6 + tamanhoProtocolo));
             mensagemJsonObject.addProperty("mensagem", mensagem.substring(6 + tamanhoProtocolo));
@@ -168,22 +168,20 @@ public class CommMiddleware implements NodeConnectionListener {
         }
     }
 
-    public JsonObject desenharMensagem(String tipo, String abrangencia, String sender, Term force, Term msg) {
+    public JsonObject desenharMensagem(String tipo, String abrangencia, String receiver, Term force, Term msg) {
         JsonObject mensagemJsonObject = new JsonObject();
         mensagemJsonObject.addProperty("tipo", tipo);
         mensagemJsonObject.addProperty("abrangencia", abrangencia);
-        mensagemJsonObject.addProperty("endereco", sender);
-        //mensagemJsonObject.addProperty("UUIDdestino", receiver.substring(1, receiver.length() - 2));
+        mensagemJsonObject.addProperty("endereco", receiver.substring(1, receiver.length() - 1));
+        mensagemJsonObject.addProperty("protocolo", "kqml");
         mensagemJsonObject.addProperty("forca", force.toString());
         mensagemJsonObject.addProperty("mensagem", msg.toString());
         return mensagemJsonObject;
     }
     public JsonObject desenharMensagem(String tipo, String abrangencia, String receiver) {
         JsonObject mensagemJsonObject = new JsonObject();
-        System.out.println("TIPO:" + tipo);
-        System.out.println("ABRANGENCIA:" + abrangencia);
-        System.out.println("ENDERECO: " + receiver.substring(1, receiver.length() - 1));
         mensagemJsonObject.addProperty("tipo", tipo);
+        mensagemJsonObject.addProperty("protocolo", "bioinsp");
         mensagemJsonObject.addProperty("abrangencia", abrangencia);
         mensagemJsonObject.addProperty("endereco", receiver.substring(1, receiver.length() - 1));
         return mensagemJsonObject;
@@ -229,28 +227,44 @@ public class CommMiddleware implements NodeConnectionListener {
     public int validarRegras(JsonObject mensagem) {
         int resultado = 0;
         int contador = 0;
-
         if (this.ruleList.size() == 0) {
             resultado = this.validarPoliticas(mensagem);
         } else {
             for (int i = 0; i < this.ruleList.size(); i++) {
                 if (this.ruleList.get(i).getAsJsonObject().get("tipo").getAsString().equals(mensagem.get("tipo").getAsString())) {
                     if (this.ruleList.get(i).getAsJsonObject().get("endereco").getAsString().equals(mensagem.get("endereco").toString())) {
-                        contador += 1;
-                        if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
-                            resultado = 1;
-                        } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
-                            resultado = 0;
-                        }
-                        if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication") && mensagem.get("abrangencia").getAsString().equals("communication") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
-                            resultado = 1;
-                        } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication") && mensagem.get("abrangencia").getAsString().equals("communication") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
-                            resultado = 0;
-                        }
-                        if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration") && mensagem.get("abrangencia").getAsString().equals("migration") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
-                            resultado = 1;
-                        } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration") && mensagem.get("abrangencia").getAsString().equals("migration") && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
-                            resultado = 0;
+                        if (protocolo != all != kqml != bioinsp) {
+
+                        } else {
+                            if (this.ruleList.get(i).getAsJsonObject().get("protocolo").getAsString().equals(mensagem.get("protocolo").getAsString())
+                                    || this.ruleList.get(i).getAsJsonObject().get("protocolo").getAsString().equals("all")) {
+                                contador += 1;
+                                if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")
+                                        && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                                    resultado = 1;
+                                } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")
+                                        && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                                    resultado = 0;
+                                }
+                                if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication")
+                                        && mensagem.get("abrangencia").getAsString().equals("communication")
+                                        && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                                    resultado = 1;
+                                } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication")
+                                        && mensagem.get("abrangencia").getAsString().equals("communication")
+                                        && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                                    resultado = 0;
+                                }
+                                if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration")
+                                        && mensagem.get("abrangencia").getAsString().equals("migration")
+                                        && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                                    resultado = 1;
+                                } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration")
+                                        && mensagem.get("abrangencia").getAsString().equals("migration")
+                                        && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                                    resultado = 0;
+                                }
+                            }
                         }
                     }
                 }
@@ -516,7 +530,7 @@ public class CommMiddleware implements NodeConnectionListener {
         String tipo = "output";
         String abrangencia = "communication";
 
-        JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, sender, force, msg);
+        JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, receiver, force, msg);
         System.out.println("JSON OBJECT DO SENDMSG: " +mensagemJsonObject);
         int resultado = this.validarRegras(mensagemJsonObject);
         if (resultado == 0) {

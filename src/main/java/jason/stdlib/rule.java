@@ -50,8 +50,8 @@ public class rule extends DefaultInternalAction{
                     if ( args[2].toString().isEmpty() ){
                         System.out.println("O valor inserido na rule para endereco está incorreto.");
                     } else {
-                            if (!args[3].toString().equals("all") && !args[3].toString().equals("illocutionary") && !args[3].toString().equals("bioinsp")) {
-                                System.out.println("O valor inserido na rule para força/protocolo esta incorreto. all/illocutionary/bioinsp");
+                            if (!args[3].toString().equals("all") && !args[3].toString().equals("kqml") && !args[3].toString().equals("bioinsp")) {
+                                System.out.println("O valor inserido na rule para força/protocolo esta incorreto. all/kqml/bioinsp");
                             } else {
                                 if (!args[4].toString().equals("accept") && !args[4].toString().equals("drop")) {
                                     System.out.println("O valor inserido na rule para determinação está incorreto. accept/drop");
@@ -60,7 +60,7 @@ public class rule extends DefaultInternalAction{
                                     rule.addProperty("tipo", args[0].toString());
                                     rule.addProperty("abrangencia", args[1].toString());
                                     rule.addProperty("endereco", args[2].toString());
-                                    rule.addProperty("forca", args[3].toString());
+                                    rule.addProperty("protocolo", args[3].toString());
                                     rule.addProperty("determinacao", args[4].toString());
                                     ts.getUserAgArch().setFirewallRule(rule);
                                 }
