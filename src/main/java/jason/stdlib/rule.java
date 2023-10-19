@@ -38,23 +38,30 @@ public class rule extends DefaultInternalAction{
 
     @Override
     public Object execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        int error = 0;
         if(args.length != 5){
             System.out.println("Numero incorreto de argumentos para criar uma nova rule");
+            error++;
         }else{
             if(!args[0].toString().equals("input") && !args[0].toString().equals("output")){
                 System.out.println("O valor inserido na rule para tipo está incorreto. input/output");
+                error++;
             }else {
                 if (!args[1].toString().equals("all") && !args[1].toString().equals("communication") && !args[1].toString().equals("migration")) {
                     System.out.println("O valor inserido na rule para abrangencia está incorreto. all/communication/migration");
+                    error++;
                 } else {
                     if ( args[2].toString().isEmpty() ){
                         System.out.println("O valor inserido na rule para endereco está incorreto.");
+                        error++;
                     } else {
-                            if (!args[3].toString().equals("all") && !args[3].toString().equals("kqml") && !args[3].toString().equals("bioinsp")) {
+                            if (!validarProtocolo(args[3].toString(), args[1].toString())) {
                                 System.out.println("O valor inserido na rule para força/protocolo esta incorreto. all/kqml/bioinsp");
+                                error++;
                             } else {
                                 if (!args[4].toString().equals("accept") && !args[4].toString().equals("drop")) {
                                     System.out.println("O valor inserido na rule para determinação está incorreto. accept/drop");
+                                    error++;
                                 } else {
                                     JsonObject rule = new JsonObject();
                                     rule.addProperty("tipo", args[0].toString());
@@ -69,6 +76,45 @@ public class rule extends DefaultInternalAction{
                     }
                 }
             }
+        if(error > 0)
+            return false;
         return true;
+    }
+
+    private boolean validarProtocolo(String protocolo, String abrangencia){
+        if (abrangencia.equals("all")) {
+            switch (protocolo) {
+                case "tell":
+                case "untell":
+                case "ask one":
+                case "ask all":
+                case "achieve":
+                case "unachieve":
+                case "mutualism":
+                case "inquilinism":
+                case "predatism":
+                case "all":
+                    return true;
+            }
+        }else if (abrangencia.equals("communication")) {
+            switch (protocolo) {
+                case "tell":
+                case "untell":
+                case "ask one":
+                case "ask all":
+                case "achieve":
+                case "unachieve":
+                    return true;
+            }
+        } else if (abrangencia.equals("migration")) {
+            switch (protocolo) {
+                case "mutualism":
+                case "inquilinism":
+                case "predatism":
+                case "all":
+                    return true;
+            }
+        }
+        return false;
     }
 }

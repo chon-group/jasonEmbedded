@@ -233,37 +233,33 @@ public class CommMiddleware implements NodeConnectionListener {
             for (int i = 0; i < this.ruleList.size(); i++) {
                 if (this.ruleList.get(i).getAsJsonObject().get("tipo").getAsString().equals(mensagem.get("tipo").getAsString())) {
                     if (this.ruleList.get(i).getAsJsonObject().get("endereco").getAsString().equals(mensagem.get("endereco").toString())) {
-                        if (protocolo != all != kqml != bioinsp) {
-
-                        } else {
-                            if (this.ruleList.get(i).getAsJsonObject().get("protocolo").getAsString().equals(mensagem.get("protocolo").getAsString())
-                                    || this.ruleList.get(i).getAsJsonObject().get("protocolo").getAsString().equals("all")) {
-                                contador += 1;
-                                if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")
-                                        && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
-                                    resultado = 1;
-                                } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")
-                                        && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
-                                    resultado = 0;
-                                }
-                                if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication")
-                                        && mensagem.get("abrangencia").getAsString().equals("communication")
-                                        && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
-                                    resultado = 1;
-                                } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication")
-                                        && mensagem.get("abrangencia").getAsString().equals("communication")
-                                        && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
-                                    resultado = 0;
-                                }
-                                if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration")
-                                        && mensagem.get("abrangencia").getAsString().equals("migration")
-                                        && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
-                                    resultado = 1;
-                                } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration")
-                                        && mensagem.get("abrangencia").getAsString().equals("migration")
-                                        && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
-                                    resultado = 0;
-                                }
+                        if (this.ruleList.get(i).getAsJsonObject().get("protocolo").getAsString().equals(mensagem.get("protocolo").getAsString())
+                                || this.ruleList.get(i).getAsJsonObject().get("protocolo").getAsString().equals("all")) {
+                            contador += 1;
+                            if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")
+                                    && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                                resultado = 1;
+                            } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")
+                                    && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                                resultado = 0;
+                            }
+                            if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication")
+                                    && mensagem.get("abrangencia").getAsString().equals("communication")
+                                    && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                                resultado = 1;
+                            } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication")
+                                    && mensagem.get("abrangencia").getAsString().equals("communication")
+                                    && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                                resultado = 0;
+                            }
+                            if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration")
+                                    && mensagem.get("abrangencia").getAsString().equals("migration")
+                                    && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                                resultado = 1;
+                            } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration")
+                                    && mensagem.get("abrangencia").getAsString().equals("migration")
+                                    && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                                resultado = 0;
                             }
                         }
                     }
