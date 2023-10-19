@@ -151,115 +151,127 @@ public class CommMiddleware implements NodeConnectionListener {
             mensagemJsonObject.addProperty("tipo", tipo);
             mensagemJsonObject.addProperty("abrangencia", "communication");
             mensagemJsonObject.addProperty("endereco", message.getSenderID().toString());
-            mensagemJsonObject.addProperty("protocolo", "kqml");
-            int tamanhoForca = hex2int(char2int(mensagem.charAt(43)), char2int(mensagem.charAt(42)));
-            mensagemJsonObject.addProperty("forca", mensagem.substring(44, 44 + tamanhoForca));
-            mensagemJsonObject.addProperty("mensagem", mensagem.substring(46 + tamanhoForca));
+            int tamanhoProtocolo = hex2int(char2int(mensagem.charAt(43)), char2int(mensagem.charAt(42)));
+            mensagemJsonObject.addProperty("protocolo", mensagem.substring(44, 44 + tamanhoProtocolo));
+            mensagemJsonObject.addProperty("mensagem", mensagem.substring(46 + tamanhoProtocolo));
             return mensagemJsonObject;
         } else {
             mensagemJsonObject.addProperty("tipo", tipo);
             mensagemJsonObject.addProperty("abrangencia", "migration");
             mensagemJsonObject.addProperty("endereco", message.getSenderID().toString());
-            mensagemJsonObject.addProperty("protocolo", "bioinsp");
             int tamanhoProtocolo = identificador;
-            mensagemJsonObject.addProperty("forca", mensagem.substring(6, 6 + tamanhoProtocolo));
+            mensagemJsonObject.addProperty("protocolo", mensagem.substring(6, 6 + tamanhoProtocolo));
             mensagemJsonObject.addProperty("mensagem", mensagem.substring(6 + tamanhoProtocolo));
             return mensagemJsonObject;
         }
     }
 
-    public JsonObject desenharMensagem(String tipo, String abrangencia, String receiver, Term force, Term msg) {
+    public JsonObject desenharMensagem(String tipo, String abrangencia, String receiver, String protocolo, Term msg) {
         JsonObject mensagemJsonObject = new JsonObject();
         mensagemJsonObject.addProperty("tipo", tipo);
         mensagemJsonObject.addProperty("abrangencia", abrangencia);
         mensagemJsonObject.addProperty("endereco", receiver.substring(1, receiver.length() - 1));
-        mensagemJsonObject.addProperty("protocolo", "kqml");
-        mensagemJsonObject.addProperty("forca", force.toString());
+        mensagemJsonObject.addProperty("protocolo", protocolo);
         mensagemJsonObject.addProperty("mensagem", msg.toString());
         return mensagemJsonObject;
     }
-    public JsonObject desenharMensagem(String tipo, String abrangencia, String receiver) {
+    public JsonObject desenharMensagem(String tipo, String abrangencia, String receiver, String protocolo) {
         JsonObject mensagemJsonObject = new JsonObject();
         mensagemJsonObject.addProperty("tipo", tipo);
-        mensagemJsonObject.addProperty("protocolo", "bioinsp");
+        mensagemJsonObject.addProperty("protocolo", protocolo);
         mensagemJsonObject.addProperty("abrangencia", abrangencia);
         mensagemJsonObject.addProperty("endereco", receiver.substring(1, receiver.length() - 1));
         return mensagemJsonObject;
     }
 
 
-    public int validarPoliticas(JsonObject mensagem) {
-        int resultado = 0;
+    public boolean validarPoliticas(JsonObject mensagem) {
+        boolean resultado = false;
         int contador = 0;
         if (this.policyList.size() == 0) {
-            resultado = 1;
+            resultado = true;
         } else {
             for (int i = 0; i < this.policyList.size(); i++) {
-                if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all") && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept") && this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")) {
-                    contador += 1;
-                    resultado = 1;
-                } else if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all") && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
-                    contador += 1;
-                    resultado = 0;
-                }
-                if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication") && mensagem.get("abrangencia").getAsString().equals("communication") && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
-                    contador += 1;
-                    resultado = 1;
-                } else if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication") && mensagem.get("abrangencia").getAsString().equals("communication") && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
-                    contador += 1;
-                    resultado = 0;
-                }
-                if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration") && mensagem.get("abrangencia").getAsString().equals("migration") && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
-                    contador += 1;
-                    resultado = 1;
-                } else if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration") && mensagem.get("abrangencia").getAsString().equals("migration") && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
-                    contador += 1;
-                    resultado = 0;
+                if (this.policyList.get(i).getAsJsonObject().get("tipo").getAsString().equals("all")
+                        || this.policyList.get(i).getAsJsonObject().get("tipo").getAsString().equals(mensagem.get("tipo").getAsString())) {
+                    if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")
+                            && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")
+                            && this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")) {
+                        contador += 1;
+                        resultado = true;
+                    } else if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")
+                            && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                        contador += 1;
+                        resultado = false;
+                    }
+                    if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication")
+                            && mensagem.get("abrangencia").getAsString().equals("communication")
+                            && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                        contador += 1;
+                        resultado = true;
+                    } else if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication")
+                            && mensagem.get("abrangencia").getAsString().equals("communication")
+                            && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                        contador += 1;
+                        resultado = false;
+                    }
+                    if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration")
+                            && mensagem.get("abrangencia").getAsString().equals("migration")
+                            && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                        contador += 1;
+                        resultado = true;
+                    } else if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration")
+                            && mensagem.get("abrangencia").getAsString().equals("migration")
+                            && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                        contador += 1;
+                        resultado = false;
+                    }
                 }
             }
         }
         if(contador == 0){
-            resultado = 1;
+            resultado = true;
         }
         return resultado;
     }
 
-    public int validarRegras(JsonObject mensagem) {
-        int resultado = 0;
+    public boolean validarRegras(JsonObject mensagem) {
+        boolean resultado = false;
         int contador = 0;
         if (this.ruleList.size() == 0) {
             resultado = this.validarPoliticas(mensagem);
         } else {
             for (int i = 0; i < this.ruleList.size(); i++) {
-                if (this.ruleList.get(i).getAsJsonObject().get("tipo").getAsString().equals(mensagem.get("tipo").getAsString())) {
+                if (this.ruleList.get(i).getAsJsonObject().get("tipo").getAsString().equals("all")
+                        || this.ruleList.get(i).getAsJsonObject().get("tipo").getAsString().equals(mensagem.get("tipo").getAsString())) {
                     if (this.ruleList.get(i).getAsJsonObject().get("endereco").getAsString().equals(mensagem.get("endereco").toString())) {
                         if (this.ruleList.get(i).getAsJsonObject().get("protocolo").getAsString().equals(mensagem.get("protocolo").getAsString())
                                 || this.ruleList.get(i).getAsJsonObject().get("protocolo").getAsString().equals("all")) {
                             contador += 1;
                             if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")
                                     && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
-                                resultado = 1;
+                                resultado = true;
                             } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")
                                     && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
-                                resultado = 0;
+                                resultado = false;
                             }
                             if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication")
                                     && mensagem.get("abrangencia").getAsString().equals("communication")
                                     && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
-                                resultado = 1;
+                                resultado = true;
                             } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication")
                                     && mensagem.get("abrangencia").getAsString().equals("communication")
                                     && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
-                                resultado = 0;
+                                resultado = false;
                             }
                             if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration")
                                     && mensagem.get("abrangencia").getAsString().equals("migration")
                                     && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
-                                resultado = 1;
+                                resultado = true;
                             } else if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration")
                                     && mensagem.get("abrangencia").getAsString().equals("migration")
                                     && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
-                                resultado = 0;
+                                resultado = false;
                             }
                         }
                     }
@@ -275,8 +287,8 @@ public class CommMiddleware implements NodeConnectionListener {
     public void newMessageReceived(NodeConnection remoteCon, Message message) {
         String tipo = "input";
         JsonObject mensagemJsonObject = desenharMensagem(message, tipo);
-        int resultado = this.validarRegras(mensagemJsonObject);
-        if (resultado == 0) {
+        boolean resultado = this.validarRegras(mensagemJsonObject);
+        if (!resultado) {
             System.out.println("O agente nao tem permissao para executar a acao de entrada");
         } else {
             if (message.getContentObject() instanceof String) {
@@ -526,10 +538,10 @@ public class CommMiddleware implements NodeConnectionListener {
         String tipo = "output";
         String abrangencia = "communication";
 
-        JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, receiver, force, msg);
+        JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, receiver, force.toString(), msg);
         System.out.println("JSON OBJECT DO SENDMSG: " +mensagemJsonObject);
-        int resultado = this.validarRegras(mensagemJsonObject);
-        if (resultado == 0) {
+        boolean resultado = this.validarRegras(mensagemJsonObject);
+        if (!resultado) {
             System.out.println("O agente nao tem permissao para executar a acao de sendOUT");
         } else {
             ApplicationMessage message = new ApplicationMessage();
@@ -547,10 +559,10 @@ public class CommMiddleware implements NodeConnectionListener {
         String tipo = "output";
         String abrangencia = "migration";
 
-        JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, receiver);
+        JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, receiver, protocol.toString());
         System.out.println("JSON OBJECT DO SENDALL:  " +mensagemJsonObject);
-        int resultado = this.validarRegras(mensagemJsonObject);
-        if (resultado == 0) {
+        boolean resultado = this.validarRegras(mensagemJsonObject);
+        if (!resultado) {
             System.out.println("O agente nao tem permissao para executar a acao de moveOUT");
         } else {
             ApplicationMessage message = new ApplicationMessage();
@@ -572,10 +584,10 @@ public class CommMiddleware implements NodeConnectionListener {
         String tipo = "output";
         String abrangencia = "migration";
 
-        JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, receiver);
+        JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, receiver, protocol.toString());
         System.out.println("JSON OBJECT DO SEND AGENT: " +mensagemJsonObject);
-        int resultado = this.validarRegras(mensagemJsonObject);
-        if (resultado == 0) {
+        boolean resultado = this.validarRegras(mensagemJsonObject);
+        if (!resultado) {
             System.out.println("O agente nao tem permissao para executar a acao de moveOUT");
         } else {
             ApplicationMessage message = new ApplicationMessage();
