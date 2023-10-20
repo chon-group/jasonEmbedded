@@ -1,12 +1,12 @@
 package jason.stdlib;
 
-import group.chon.inmet.InmetRSS;
+import group.chon.pythia.inmetGovBR.InmetRSS;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
-public class inmetClear extends DefaultInternalAction {
+public class inmetGovBrClear extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         InmetRSS inmetRSS = new InmetRSS();
