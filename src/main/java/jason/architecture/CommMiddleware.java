@@ -246,7 +246,8 @@ public class CommMiddleware implements NodeConnectionListener {
                         || this.ruleList.get(i).getAsJsonObject().get("tipo").getAsString().equals(mensagem.get("tipo").getAsString())) {
                     if (this.ruleList.get(i).getAsJsonObject().get("endereco").getAsString().equals(mensagem.get("endereco").toString())) {
                         if (this.ruleList.get(i).getAsJsonObject().get("protocolo").getAsString().equals(mensagem.get("protocolo").getAsString())
-                                || this.ruleList.get(i).getAsJsonObject().get("protocolo").getAsString().equals("all")) {
+                                || this.ruleList.get(i).getAsJsonObject().get("protocolo").getAsString().equals("all")
+                                || validarProtocolo(this.ruleList.get(i).getAsJsonObject().get("protocolo").getAsString(), mensagem.get("protocolo").getAsString())){
                             contador += 1;
                             if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")
                                     && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
@@ -282,6 +283,48 @@ public class CommMiddleware implements NodeConnectionListener {
             resultado = this.validarPoliticas(mensagem);
         }
         return resultado;
+    }
+
+    private boolean validarProtocolo(String protocolo, String protocoloMensagem){
+        if (protocoloMensagem.equals("all")) {
+            switch (protocolo) {
+                case "all":
+                case "kqml":
+                case "bioinsp":
+                case "tell":
+                case "untell":
+                case "askOne":
+                case "askAll":
+                case "achieve":
+                case "unachieve":
+                case "mutualism":
+                case "inquilinism":
+                case "predatism":
+                    return true;
+            }
+        }else if (protocoloMensagem.equals("kqml")) {
+            switch (protocolo) {
+                case "all":
+                case "kqml":
+                case "tell":
+                case "untell":
+                case "askOne":
+                case "askAll":
+                case "achieve":
+                case "unachieve":
+                    return true;
+            }
+        } else if (protocoloMensagem.equals("bioinsp")) {
+            switch (protocolo) {
+                case "all":
+                case "bioinsp":
+                case "mutualism":
+                case "inquilinism":
+                case "predatism":
+                    return true;
+            }
+        }
+        return false;
     }
 
     public void newMessageReceived(NodeConnection remoteCon, Message message) {
@@ -539,7 +582,6 @@ public class CommMiddleware implements NodeConnectionListener {
         String abrangencia = "communication";
 
         JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, receiver, force.toString(), msg);
-        System.out.println("JSON OBJECT DO SENDMSG: " +mensagemJsonObject);
         boolean resultado = this.validarRegras(mensagemJsonObject);
         if (!resultado) {
             System.out.println("O agente nao tem permissao para executar a acao de sendOUT");
@@ -560,7 +602,6 @@ public class CommMiddleware implements NodeConnectionListener {
         String abrangencia = "migration";
 
         JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, receiver, protocol.toString());
-        System.out.println("JSON OBJECT DO SENDALL:  " +mensagemJsonObject);
         boolean resultado = this.validarRegras(mensagemJsonObject);
         if (!resultado) {
             System.out.println("O agente nao tem permissao para executar a acao de moveOUT");
@@ -585,7 +626,6 @@ public class CommMiddleware implements NodeConnectionListener {
         String abrangencia = "migration";
 
         JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, receiver, protocol.toString());
-        System.out.println("JSON OBJECT DO SEND AGENT: " +mensagemJsonObject);
         boolean resultado = this.validarRegras(mensagemJsonObject);
         if (!resultado) {
             System.out.println("O agente nao tem permissao para executar a acao de moveOUT");
