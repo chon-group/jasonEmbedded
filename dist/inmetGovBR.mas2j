@@ -1,0 +1,11 @@
+/* Jason Project */
+
+MAS inmetGovBR {
+
+    infrastructure: Centralised
+
+    agents:
+        bob;
+
+}
+

@@ -6,9 +6,9 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
-import group.chon.pythia.inmetGovBR.*;
-
-import java.util.ArrayList;
+import group.chon.pythia.inmetGovBR.InmetRSS;
+import group.chon.pythia.inmetGovBR.InmetAlert;
+import java.text.Normalizer;
 
 public class inmetGovBrCheck extends DefaultInternalAction {
     private InmetAlert inmetAlert = null;
@@ -22,17 +22,16 @@ public class inmetGovBrCheck extends DefaultInternalAction {
             inmetAlert = inmetRSS.getLastUnperceivedAlert(Integer.parseInt(args[1].toString()));
             if(inmetAlert!=null){
                 strBelief = "inmetAlert("+ inmetAlert.getId() +
-                        "," + convertString(inmetAlert.getEvent())+
-                        "," + convertString(inmetAlert.getSeverity()) +
-                        "," + convertString(inmetAlert.getCertainty()) +
-                        ","+temporalidade(inmetAlert.getTimeStampDateOnSet(), inmetAlert.getTimeStampDateExpires())+
-                        "," + convertString(inmetAlert.getResponseType()) +
+                        "," + strToTerm(inmetAlert.getEvent())+
+                        "," + strToTerm(inmetAlert.getSeverity()) +
+                        "," + strToTerm(inmetAlert.getCertainty()) +
+                        "," + whenWillEvent(inmetAlert.getTimeStampDateOnSet(), inmetAlert.getTimeStampDateExpires())+
+                        "," + strToTerm(inmetAlert.getResponseType()) +
                         ",\"" + inmetAlert.getDescription()+"\""+
                         ",\"" + inmetAlert.getInstruction()+"\"" +
                         ",\"" + inmetAlert.getWeb()+"\""+
                         ")";
                 //ts.getAg().getBB().add(Literal.parseLiteral(strBelief));
-
                 Message m = new Message("tell",
                         "inmetGovBR",
                         ts.getUserAgArch().getAgName(),
@@ -44,7 +43,7 @@ public class inmetGovBrCheck extends DefaultInternalAction {
         return true;
     }
 
-    private String temporalidade(Long timeStampDateOnSet, Long timeStampDateExpires){
+    private String whenWillEvent(Long timeStampDateOnSet, Long timeStampDateExpires){
         if(inmetRSS.isFuture(timeStampDateOnSet,timeStampDateExpires)){
             return "future";
         } else if (inmetRSS.isRightNow(timeStampDateOnSet,timeStampDateExpires)) {
@@ -55,11 +54,11 @@ public class inmetGovBrCheck extends DefaultInternalAction {
 
     }
 
-    private String convertString(String inputStr){
-        return inputStr.substring(0, 1).toLowerCase() + removeEspaco(inputStr.substring(1));
+    private String strToTerm(String inputStr){
+        String strAux = Normalizer.normalize(inputStr, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+        inputStr = strAux.replaceAll(" ", "");
+        strAux = inputStr.substring(0, 1).toLowerCase() + inputStr.substring(1);
+        return strAux;
     }
-
-    private String removeEspaco(String inputStr){
-        return inputStr.replaceAll(" ", "");
-    }
+    
 }

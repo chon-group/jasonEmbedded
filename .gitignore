@@ -3,6 +3,6 @@ target/
 *.iml
 .idea/
 .settings/
-out/
+dist/.rss/
 .classpath
 .project
