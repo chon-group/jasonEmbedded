@@ -194,37 +194,41 @@ public class CommMiddleware implements NodeConnectionListener {
             for (int i = 0; i < this.policyList.size(); i++) {
                 if (this.policyList.get(i).getAsJsonObject().get("tipo").getAsString().equals("all")
                         || this.policyList.get(i).getAsJsonObject().get("tipo").getAsString().equals(mensagem.get("tipo").getAsString())) {
-                    if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")
-                            && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")
-                            && this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")) {
-                        contador += 1;
-                        resultado = true;
-                    } else if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")
-                            && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
-                        contador += 1;
-                        resultado = false;
-                    }
-                    if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication")
-                            && mensagem.get("abrangencia").getAsString().equals("communication")
-                            && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
-                        contador += 1;
-                        resultado = true;
-                    } else if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication")
-                            && mensagem.get("abrangencia").getAsString().equals("communication")
-                            && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
-                        contador += 1;
-                        resultado = false;
-                    }
-                    if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration")
-                            && mensagem.get("abrangencia").getAsString().equals("migration")
-                            && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
-                        contador += 1;
-                        resultado = true;
-                    } else if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration")
-                            && mensagem.get("abrangencia").getAsString().equals("migration")
-                            && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
-                        contador += 1;
-                        resultado = false;
+                    if (this.policyList.get(i).getAsJsonObject().get("protocolo").getAsString().equals(mensagem.get("protocolo").getAsString().toLowerCase())
+                            || this.policyList.get(i).getAsJsonObject().get("protocolo").getAsString().equals("all")
+                            || validarProtocolo(this.policyList.get(i).getAsJsonObject().get("protocolo").getAsString(), mensagem.get("protocolo").getAsString().toLowerCase())) {
+                        if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")
+                                && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")
+                                && this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")) {
+                            contador += 1;
+                            resultado = true;
+                        } else if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")
+                                && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                            contador += 1;
+                            resultado = false;
+                        }
+                        if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication")
+                                && mensagem.get("abrangencia").getAsString().equals("communication")
+                                && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                            contador += 1;
+                            resultado = true;
+                        } else if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("communication")
+                                && mensagem.get("abrangencia").getAsString().equals("communication")
+                                && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                            contador += 1;
+                            resultado = false;
+                        }
+                        if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration")
+                                && mensagem.get("abrangencia").getAsString().equals("migration")
+                                && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
+                            contador += 1;
+                            resultado = true;
+                        } else if (this.policyList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("migration")
+                                && mensagem.get("abrangencia").getAsString().equals("migration")
+                                && this.policyList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("drop")) {
+                            contador += 1;
+                            resultado = false;
+                        }
                     }
                 }
             }
@@ -245,9 +249,9 @@ public class CommMiddleware implements NodeConnectionListener {
                 if (this.ruleList.get(i).getAsJsonObject().get("tipo").getAsString().equals("all")
                         || this.ruleList.get(i).getAsJsonObject().get("tipo").getAsString().equals(mensagem.get("tipo").getAsString())) {
                     if (this.ruleList.get(i).getAsJsonObject().get("endereco").getAsString().equals(mensagem.get("endereco").toString())) {
-                        if (this.ruleList.get(i).getAsJsonObject().get("protocolo").getAsString().equals(mensagem.get("protocolo").getAsString())
+                        if (this.ruleList.get(i).getAsJsonObject().get("protocolo").getAsString().equals(mensagem.get("protocolo").getAsString().toLowerCase())
                                 || this.ruleList.get(i).getAsJsonObject().get("protocolo").getAsString().equals("all")
-                                || validarProtocolo(this.ruleList.get(i).getAsJsonObject().get("protocolo").getAsString(), mensagem.get("protocolo").getAsString())){
+                                || validarProtocolo(this.ruleList.get(i).getAsJsonObject().get("protocolo").getAsString(), mensagem.get("protocolo").getAsString().toLowerCase())){
                             contador += 1;
                             if (this.ruleList.get(i).getAsJsonObject().get("abrangencia").getAsString().equals("all")
                                     && this.ruleList.get(i).getAsJsonObject().get("determinacao").getAsString().equals("accept")) {
@@ -284,43 +288,35 @@ public class CommMiddleware implements NodeConnectionListener {
         }
         return resultado;
     }
-
     private boolean validarProtocolo(String protocolo, String protocoloMensagem){
-        if (protocoloMensagem.equals("all")) {
-            switch (protocolo) {
-                case "all":
-                case "kqml":
-                case "bioinsp":
+        if (protocolo.equals("all")) {
+            switch (protocoloMensagem) {
                 case "tell":
                 case "untell":
-                case "askOne":
-                case "askAll":
+                case "askone":
+                case "askall":
                 case "achieve":
                 case "unachieve":
                 case "mutualism":
                 case "inquilinism":
-                case "predatism":
+                case "predation":
                     return true;
             }
-        }else if (protocoloMensagem.equals("kqml")) {
-            switch (protocolo) {
-                case "all":
-                case "kqml":
+        }else if (protocolo.equals("kqml")) {
+            switch (protocoloMensagem) {
                 case "tell":
                 case "untell":
-                case "askOne":
-                case "askAll":
+                case "askone":
+                case "askall":
                 case "achieve":
                 case "unachieve":
                     return true;
             }
-        } else if (protocoloMensagem.equals("bioinsp")) {
-            switch (protocolo) {
-                case "all":
-                case "bioinsp":
+        } else if (protocolo.equals("bioinsp")) {
+            switch (protocoloMensagem) {
                 case "mutualism":
                 case "inquilinism":
-                case "predatism":
+                case "predation":
                     return true;
             }
         }
@@ -332,7 +328,7 @@ public class CommMiddleware implements NodeConnectionListener {
         JsonObject mensagemJsonObject = desenharMensagem(message, tipo);
         boolean resultado = this.validarRegras(mensagemJsonObject);
         if (!resultado) {
-            System.out.println("O agente nao tem permissao para executar a acao de entrada");
+            System.out.println("O agente nao tem permissão para executar a ação de entrada");
         } else {
             if (message.getContentObject() instanceof String) {
                 this.extractMessageFromContextNet(message.getContentObject().toString().toCharArray());
@@ -584,7 +580,7 @@ public class CommMiddleware implements NodeConnectionListener {
         JsonObject mensagemJsonObject = desenharMensagem(tipo, abrangencia, receiver, force.toString(), msg);
         boolean resultado = this.validarRegras(mensagemJsonObject);
         if (!resultado) {
-            System.out.println("O agente nao tem permissao para executar a acao de sendOUT");
+            System.out.println("O agente nao tem permissão para executar a ação de sendOUT");
         } else {
             ApplicationMessage message = new ApplicationMessage();
             message.setContentObject(this.prepareToSend(sender, force.toString(), msg.toString()));

@@ -60,7 +60,7 @@ public class rule extends DefaultInternalAction{
                         switch (args[1].toString()) {
                             case "all":
                                 if (!v) {
-                                    System.out.println("O valor inserido na rule para protocolo esta incorreto. all/kqml/bioinsp/tell/untell/askOne/askAll/achieve/unachieve/mutualism/inquilinism/pedratism");
+                                    System.out.println("O valor inserido na rule para protocolo esta incorreto. all/kqml/bioinsp/tell/untell/askOne/askAll/achieve/unachieve/mutualism/inquilinism/predation");
                                     return false;
                                 }
                             case "communication":
@@ -70,7 +70,7 @@ public class rule extends DefaultInternalAction{
                                 }
                             case "migration":
                                 if (!v) {
-                                    System.out.println("O valor inserido na rule para protocolo de migração esta incorreto. bioinsp/mutualism/inquilinism/pedratism");
+                                    System.out.println("O valor inserido na rule para protocolo de migração esta incorreto. bioinsp/mutualism/inquilinism/predation");
                                     return false;
                                 }
                         }
@@ -109,7 +109,7 @@ public class rule extends DefaultInternalAction{
                 case "unachieve":
                 case "mutualism":
                 case "inquilinism":
-                case "predatism":
+                case "predation":
                 case "all":
                     return true;
             }
@@ -130,7 +130,7 @@ public class rule extends DefaultInternalAction{
                 case "bioinsp":
                 case "mutualism":
                 case "inquilinism":
-                case "predatism":
+                case "predation":
                 case "all":
                     return true;
             }

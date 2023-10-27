@@ -35,7 +35,7 @@ public class policy extends DefaultInternalAction{
                     switch (args[1].toString()) {
                         case "all":
                             if (!v) {
-                                System.out.println("O valor inserido na policy para protocolo esta incorreto. all/kqml/bioinsp/tell/untell/askOne/askAll/achieve/unachieve/mutualism/inquilinism/pedratism");
+                                System.out.println("O valor inserido na policy para protocolo esta incorreto. all/kqml/bioinsp/tell/untell/askOne/askAll/achieve/unachieve/mutualism/inquilinism/predation");
                                 return false;
                             }
                         case "communication":
@@ -45,7 +45,7 @@ public class policy extends DefaultInternalAction{
                             }
                         case "migration":
                             if (!v) {
-                                System.out.println("O valor inserido na policy para protocolo de migração esta incorreto. bioinsp/mutualism/inquilinism/pedratism");
+                                System.out.println("O valor inserido na policy para protocolo de migração esta incorreto. bioinsp/mutualism/inquilinism/predation");
                                 return false;
                             }
                     }
@@ -83,7 +83,7 @@ public class policy extends DefaultInternalAction{
                 case "unachieve":
                 case "mutualism":
                 case "inquilinism":
-                case "predatism":
+                case "predation":
                     return true;
             }
         }else if (abrangencia.equals("communication")) {
@@ -104,7 +104,7 @@ public class policy extends DefaultInternalAction{
                 case "bioinsp":
                 case "mutualism":
                 case "inquilinism":
-                case "predatism":
+                case "predation":
                     return true;
             }
         }
