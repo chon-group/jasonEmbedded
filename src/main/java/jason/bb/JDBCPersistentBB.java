@@ -97,7 +97,7 @@ public class JDBCPersistentBB extends ChainBBAdapter {
     public void init(Agent ag, String[] args) {
         try {
             agentName = ag.getTS().getUserAgArch().getAgName();
-        } catch (Exception _) {
+        } catch (Exception exception) {
             logger.warning("Can not get the agent.asl name!");
             agentName = "none";
         }

@@ -1,0 +1,11 @@
+/* Jason Project */
+
+MAS multiAgentSystem {
+
+    infrastructure: Centralised
+
+    agents:
+        bob agentArchClass Communicator;
+
+}
+

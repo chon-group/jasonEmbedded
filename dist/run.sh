@@ -1,1 +1,1 @@
-java -jar jasonEmbeddedWithPythia.jar inmetGovBR.mas2j -console
+java -jar jasonEmbeddedWithPythia.jar multiAgentSystem.mas2j -console
