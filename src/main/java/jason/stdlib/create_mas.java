@@ -24,12 +24,9 @@
 package jason.stdlib;
 
 import jason.asSemantics.DefaultInternalAction;
-import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.*;
-import moise.os.fs.Goal;
-
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
@@ -47,22 +44,22 @@ public class create_mas extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         String randomDir = null;
-        if(args.length==1){
+        if(args.length==2){
             randomDir = createRandomDir();
             descompactarZip(args[0].toString().replace("\"", ""),randomDir);
-            runNewMAS(randomDir);
+            runNewMAS(randomDir,args[1].toString());
             return true;
-        }else if(args.length==2){
+        }else if(args.length==3){
             try{
                 randomDir = createRandomDir();
                 descompactarZip(args[0].toString().replace("\"", ""),randomDir);
 
-                if(args[1].isList()) {
-                    if(!processList(args[1])){
+                if(args[2].isList()) {
+                    if(!processList(args[2])){
                         return false;
                     }
                 }else{
-                    if(processTerm(args[1])){
+                    if(!processTerm(args[2])){
                         return false;
                     }
                 }
@@ -71,7 +68,7 @@ public class create_mas extends DefaultInternalAction {
                     return false;
                 }
 
-                runNewMAS(randomDir);
+                runNewMAS(randomDir,args[1].toString());
                 return true;
 
             }catch (Exception ex) {
@@ -85,9 +82,27 @@ public class create_mas extends DefaultInternalAction {
 
     }
 
-    private boolean runNewMAS(String path){
-        ProcessBuilder processoBuilder = new ProcessBuilder("java", "-jar", absoluteFrameworkLocation(), path+"/"+encontrarArquivoMas2j(path), "-console");
+    private boolean runNewMAS(String path, String outputType){
+        ProcessBuilder processoBuilder = new ProcessBuilder(
+                "java",
+                "-jar",
+                absoluteFrameworkLocation(),
+                encontrarArquivoMas2j(path),
+                "-"+outputType);
         try {
+            if(outputType.equals("console")){
+                String logFile = path+File.separator+"out.log";
+                System.out.println("[JasonEmbedded] the logFile is available at "+logFile);
+                File arquivoDeLog = new File(logFile);
+                arquivoDeLog.createNewFile();
+                processoBuilder.redirectOutput(arquivoDeLog);
+
+                String errorFile = path+File.separator+"agents.log";
+                System.out.println("[JasonEmbedded] the agentsLog is available at "+errorFile);
+                File arquivoDeErro = new File(errorFile);
+                arquivoDeErro.createNewFile();
+                processoBuilder.redirectError(arquivoDeErro);
+            }
             processoBuilder.directory(new File(path));
             processoBuilder.start();
             return true;
@@ -104,7 +119,7 @@ public class create_mas extends DefaultInternalAction {
                 try{
                     listOfPlans.add(ASSyntax.parsePlan(removerAspas(arg.toString())));
                 }catch (Exception ex){
-                   listOfIntentions.add(removerAspas(arg.toString()));
+                    listOfIntentions.add(removerAspas(arg.toString()));
                 }
             }
             return true;
@@ -197,7 +212,7 @@ public class create_mas extends DefaultInternalAction {
                 writer.write(plan.toString()+"\n");
             }
             writer.close();
-            System.out.println("[JasonEmbedded] new Beliefs and Plans includes into "+randomDir+"/_onFly.asl");
+            System.out.println("[JasonEmbedded] new Beliefs and Plans included in "+randomDir+"/_onFly.asl");
             return true;
         } catch (IOException e) {
             e.printStackTrace();

@@ -13,15 +13,15 @@ myCity(3303302).
 +!start
 : inmetAlertAS(URL) 
 & myCity(COD) <- 
-  .inmetGovBrClear;
+ // .inmetGovBrClear;
   .inmetGovBrCheck(URL,COD);
   .randomUUID(MyUUID);
   .connectCN("skynet.chon.group",5500,MyUUID);
   .randomUUID(R);
-  .create_mas("extra/newMAS.zip",
+  .create_mas("extra/newMAS.zip",console,
                 [adamUUID(R),skynet("skynet.chon.group",5500),
                 "!tell","+!tell:adamUUID(MyUUID) & skynet(SRV,Port) <- .connectCN(SRV,Port,MyUUID); .wait(10000); .stopMAS.",
-                "+helloAdam[source(X)] <- .print(\"I am listen: \",X); .sendOut(X,tell,listen); .stopMAS."]);
+                "+helloAdam[source(X)] <- .print(\"I am listen: \",X); .sendOut(X,tell,listen); .wait(2000); .stopMAS."]);
   .wait(3000);
   .print("Calling Adam");
   .sendOut(R,tell,helloAdam).
