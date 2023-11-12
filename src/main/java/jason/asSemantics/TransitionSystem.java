@@ -1774,6 +1774,10 @@ public class TransitionSystem {
                         this.agArch.killAllAgents();
                     }
                 }
+                //Mailer Arch http://dx.doi.org/10.13140/RG.2.2.21002.44481
+                if(this.agArch.getEmailBridge() != null){
+                   this.agArch.addMessageToC();
+                }
             }
             nrcslbr++; // counting number of cycles since last belief revision
 

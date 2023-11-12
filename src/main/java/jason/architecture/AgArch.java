@@ -367,4 +367,7 @@ public class AgArch implements AgArchInfraTier, Comparable<AgArch> {
 
     public void disconnectCN() {}
 
+    public EMailMiddleware getEmailBridge(){
+        return null;
+    }
 }
