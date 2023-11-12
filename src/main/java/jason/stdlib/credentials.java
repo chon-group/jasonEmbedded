@@ -10,6 +10,7 @@ public class credentials extends DefaultInternalAction {
         if (args.length == 2) {
             ts.getUserAgArch().getEmailBridge().setLogin(args[0].toString().replaceAll("\"",""));
             ts.getUserAgArch().getEmailBridge().setPassword(args[1].toString().replaceAll("\"",""));
+            ts.getUserAgArch().getEmailBridge().setMailerName(ts.getUserAgArch().getAgName());
             return true;
         } else {
             return false;

@@ -2,6 +2,7 @@ package jason.architecture;
 
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.concurrent.ThreadLocalRandom;
 import javax.mail.*;
 import javax.mail.internet.*;
 
@@ -16,6 +17,10 @@ public class EMailMiddleware{
 
     private boolean RHostEnable = false;
     private boolean RPropsEnable = false;
+
+    private long lastChecked = 0;
+
+    private String mailerName = "Mailer";
 
     public Properties sslProps () {
         //Checks which properties are required for the connection / else uses the defaut
@@ -55,70 +60,81 @@ public class EMailMiddleware{
     }
     
     public ArrayList<jason.asSemantics.Message> checkEMail() {
-        Session session ;
-        Properties props = sslProps();
-        try {
-            props.put("mail.store.protocol", Rprotocol);
-            props.put("mail." + Rprotocol + ".host", Rhost);
-            props.put("mail." + Rprotocol + ".port", Rport);
-            props.put("mail." + Rprotocol + ".leaveonserver", false);
-
-            session = Session.getDefaultInstance(props);
-
-        }catch (Exception e){
-            System.out.println("Connection error:" + e);
-            return null;
-        }
-
         ArrayList<jason.asSemantics.Message> jMsg = new ArrayList<jason.asSemantics.Message>();
-        try {
-            // Connect to the email server
-            Store store = session.getStore();
-            store.connect(login, password);
-            
-            // Open the inbox folder and get the messages
-            Folder inbox = store.getFolder("INBOX");
-            inbox.open(Folder.READ_WRITE);
-            javax.mail.Message[] messages = inbox.getMessages();
+        if (System.currentTimeMillis() - this.lastChecked > 60000) {
+            try{
+                Thread.sleep(ThreadLocalRandom.current().nextInt(0, 15001));
+            }catch (InterruptedException ex){
+                //ex.printStackTrace();
+            }
+            System.out.println("["+this.mailerName +"] Cheking mailbox:"+this.login);
+            this.lastChecked = System.currentTimeMillis();
 
-            // Loop through the messages and printing info
-            for (Message message : messages) {
-                System.out.println("[EMail] New message...");
+            Session session;
+            Properties props = sslProps();
+            try {
+                props.put("mail.store.protocol", Rprotocol);
+                props.put("mail." + Rprotocol + ".host", Rhost);
+                props.put("mail." + Rprotocol + ".port", Rport);
+                props.put("mail." + Rprotocol + ".leaveonserver", false);
 
-                //Skip messages marked for deletion
-                if (message.getFlags().contains(Flags.Flag.DELETED)) {
-                    continue;
+                session = Session.getDefaultInstance(props);
+
+            } catch (Exception e) {
+                System.out.println("["+this.mailerName +"] Connection error:" + e);
+                return null;
+            }
+
+            try {
+                // Connect to the email server
+                Store store = session.getStore();
+                store.connect(login, password);
+
+                // Open the inbox folder and get the messages
+                Folder inbox = store.getFolder("INBOX");
+                inbox.open(Folder.READ_WRITE);
+                javax.mail.Message[] messages = inbox.getMessages();
+
+                // Loop through the messages and printing info
+                for (Message message : messages) {
+                    System.out.println("["+this.mailerName +"] New e-mail received!");
+
+                    //Skip messages marked for deletion
+                    if (message.getFlags().contains(Flags.Flag.DELETED)) {
+                        continue;
+                    }
+
+                    jason.asSemantics.Message jasonMsgs = new jason.asSemantics.Message(
+                            message.getSubject(),
+                            addressToString(message.getFrom()),
+                            null,
+                            message.getContent());
+                        /*
+                        jason.asSemantics.Message jasonMsgs = new jason.asSemantics.Message();
+                        jasonMsgs.setIlForce(message.getSubject());
+                        jasonMsgs.setSender(addressToString(message.getFrom()));
+                        jasonMsgs.setPropCont(message.getContent());
+                        */
+                    Error:
+                    //jasonMsgs.setReceiver(login);
+                    jMsg.add(jasonMsgs);
+
+                    //mark message for deletion
+                    message.setFlag(Flags.Flag.DELETED, true);
+
+                }
+                if (Rprotocol.contains("imap")) {
+                    inbox.expunge();
                 }
 
-                jason.asSemantics.Message jasonMsgs = new jason.asSemantics.Message(
-                        message.getSubject(),
-                        addressToString(message.getFrom()),
-                        null,
-                        message.getContent());
-                /*
-                jason.asSemantics.Message jasonMsgs = new jason.asSemantics.Message();
-                jasonMsgs.setIlForce(message.getSubject());
-                jasonMsgs.setSender(addressToString(message.getFrom()));
-                jasonMsgs.setPropCont(message.getContent());
-                */
-                //jasonMsgs.setReceiver(login);
-                jMsg.add(jasonMsgs);
+                // Close the folder and store objects
+                inbox.close();
+                store.close();
 
-                //mark message for deletion
-                message.setFlag(Flags.Flag.DELETED, true);
 
+            } catch (Exception e) {
+                System.out.println("["+this.mailerName +"] Error: " + e.getMessage());
             }
-            if (Rprotocol.contains("imap")){
-            	inbox.expunge();
-        	}
-            
-            // Close the folder and store objects
-            inbox.close();
-            store.close();
-
-
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
         }
         return jMsg;
     }
@@ -149,7 +165,7 @@ public class EMailMiddleware{
                 }
             });
         }catch (Exception e){
-            System.out.println("Connection error:" + e);
+            System.out.println("["+this.mailerName+"] Connection error:" + e);
             return;
         }
 
@@ -166,9 +182,9 @@ public class EMailMiddleware{
             // Send the message
 			Transport.send(msg,login,password);
 
-			System.out.println("Sent successfully!");
+			System.out.println("["+this.mailerName +"] Email to "+recipientEmail+" sent successfully!");
 		}catch (MessagingException e) {
-    		System.out.println("Error sending email: " + e.getMessage());
+    		System.out.println("["+this.mailerName +"] Error sending email: " + e.getMessage());
 		}
 
     }
@@ -238,6 +254,10 @@ public class EMailMiddleware{
 
     public boolean isRPropsEnable() {
         return RPropsEnable;
+    }
+
+    public void setMailerName(String mailerName){
+        this.mailerName = mailerName;
     }
 }
 

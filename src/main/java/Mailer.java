@@ -4,11 +4,11 @@ import jason.architecture.EMailMiddleware;
 import java.util.ArrayList;
 
 
-public class Communicator extends AgArch {
+public class Mailer extends AgArch {
 
     private EMailMiddleware emailBridge = null;
 
-    public Communicator(){
+    public Mailer(){
         super();
         this.emailBridge = new EMailMiddleware();
     }
