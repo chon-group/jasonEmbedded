@@ -27,6 +27,7 @@ import jason.JasonException;
 import jason.ReceiverNotFoundException;
 import jason.architecture.AgArch;
 import jason.architecture.MindInspectorAgArch;
+import jason.architecture.mindinspectorapi.MindInspectorApiAgArch;
 import jason.asSemantics.*;
 import jason.asSyntax.Literal;
 import jason.mas2j.ClassParameters;
@@ -101,6 +102,7 @@ public class CentralisedAgArch extends AgArch implements Runnable {
             createCustomArchs(agArchClasses);
 
             // mind inspector arch
+            insertAgArch(new MindInspectorApiAgArch());
             if (stts.getUserParameter("mindinspector") != null) {
                 insertAgArch(new MindInspectorAgArch());
                 getFirstAgArch().init();
