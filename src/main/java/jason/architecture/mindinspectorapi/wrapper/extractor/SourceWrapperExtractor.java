@@ -32,7 +32,7 @@ public class SourceWrapperExtractor {
             if (source == null) {
                 break;
             }
-            structure = structure.replace(source.getText(), "");
+            structure = structure.replace(source.getText().replaceAll("[\\[\\]]", ""), "");
             sources.add(source);
         }
         return sources;
