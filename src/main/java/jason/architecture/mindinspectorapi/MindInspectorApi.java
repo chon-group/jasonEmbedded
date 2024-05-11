@@ -30,7 +30,7 @@ public class MindInspectorApi {
     public static MindInspectorApi instance;
 
     /** Histórico do agente mapeado pelo nome do agente. */
-    private final Map<String, List<AgentWrapper>> historyByAgent;
+    private final Map<String, TreeMap<Integer, AgentWrapper>> historyByAgent;
 
     /** Servidor Web. */
     private HttpServer httpServer;
@@ -39,7 +39,7 @@ public class MindInspectorApi {
      * Construtor.
      */
     public MindInspectorApi() {
-        this.historyByAgent = new TreeMap<>();
+        this.historyByAgent = new HashMap<>();
     }
 
     /**
@@ -62,7 +62,7 @@ public class MindInspectorApi {
      * @param agentName     Nome do agente.
      * @param agentWrappers Histórico de estados do agente.
      */
-    public void setHistory(String agentName, List<AgentWrapper> agentWrappers) {
+    public void setHistory(String agentName, TreeMap<Integer, AgentWrapper> agentWrappers) {
         this.historyByAgent.put(agentName, agentWrappers);
     }
 
@@ -75,9 +75,7 @@ public class MindInspectorApi {
 
             exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
             exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "GET,OPTIONS");
-            exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,"
-                    + "Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, "
-                    + "Access-Control-Request-Headers, Authorization, Access-Control-Allow-Origin");
+            exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin," + "Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, " + "Access-Control-Request-Headers, Authorization, Access-Control-Allow-Origin");
 
             if (requestMethod.equalsIgnoreCase("OPTIONS")) {
                 exchange.sendResponseHeaders(200, -1);
@@ -99,21 +97,29 @@ public class MindInspectorApi {
                         return;
                     }
 
+                    TreeMap<Integer, AgentWrapper> agentByCycle = this.historyByAgent.get(name);
+                    if (agentByCycle == null) {
+                        exchange.sendResponseHeaders(404, 0);
+                        return;
+                    }
+
                     exchange.sendResponseHeaders(200, 0);
 
-                    List<AgentWrapper> agentWrappers = this.historyByAgent.get(name);
-
-                    int cycle = agentWrappers.size();
+                    int cycle = 0;
+                    int lastAgentCycle = agentByCycle.lastEntry().getValue().getCurrentCycleNumber();
                     if (parameters.containsKey("cycle")) {
                         try {
                             cycle = Integer.parseInt(parameters.get("cycle"));
+                            if (cycle > lastAgentCycle) {
+                                cycle = lastAgentCycle;
+                            }
                         } catch (NumberFormatException ignored) {
+                            cycle = lastAgentCycle;
                         }
                     }
-                    cycle--;
 
-                    AgentWrapper agentWrapper = agentWrappers.get(cycle);
-                    agentWrapper.setTotalCycleNumber(agentWrappers.size());
+                    AgentWrapper agentWrapper = agentByCycle.get(cycle);
+                    agentWrapper.setTotalCycleNumber(lastAgentCycle);
 
                     json = GSON_INSTANCE.toJson(agentWrapper);
                 } else {
@@ -121,11 +127,13 @@ public class MindInspectorApi {
 
                     List<AgentWrapper> returnAgentWrappers = new ArrayList<>();
 
-                    for (List<AgentWrapper> agentWrappers : this.historyByAgent.values()) {
-                        AgentWrapper agent = agentWrappers.get(agentWrappers.size() - 1);
+                    for (String agentName : this.historyByAgent.keySet()) {
+                        TreeMap<Integer, AgentWrapper> integerAgentWrapperTreeMap = this.historyByAgent.get(agentName);
+                        AgentWrapper agent = integerAgentWrapperTreeMap.lastEntry().getValue();
                         agent.setTotalCycleNumber(agent.getCurrentCycleNumber());
                         returnAgentWrappers.add(agent);
                     }
+
                     json = GSON_INSTANCE.toJson(returnAgentWrappers, new TypeToken<ArrayList<AgentWrapper>>() {
                     }.getType());
                 }
