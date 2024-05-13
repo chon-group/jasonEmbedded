@@ -15,7 +15,9 @@ public class AgentWrapper {
 
     private final List<PlanWrapper> plans;
 
-    private int totalCycleNumber;
+    private int newerCycleNumber;
+
+    private int olderCycleNumber;
 
     private int currentCycleNumber;
 
@@ -27,18 +29,26 @@ public class AgentWrapper {
         this.plans = plans;
     }
 
-    /**
-     * @return {@link #totalCycleNumber}
-     */
-    public int getTotalCycleNumber() {
-        return this.totalCycleNumber;
+    public int getOlderCycleNumber() {
+        return olderCycleNumber;
+    }
+
+    public void setOlderCycleNumber(int olderCycleNumber) {
+        this.olderCycleNumber = olderCycleNumber;
     }
 
     /**
-     * @param totalCycleNumber {@link #totalCycleNumber}
+     * @return {@link #newerCycleNumber}
      */
-    public void setTotalCycleNumber(int totalCycleNumber) {
-        this.totalCycleNumber = totalCycleNumber;
+    public int getNewerCycleNumber() {
+        return this.newerCycleNumber;
+    }
+
+    /**
+     * @param newerCycleNumber {@link #newerCycleNumber}
+     */
+    public void setNewerCycleNumber(int newerCycleNumber) {
+        this.newerCycleNumber = newerCycleNumber;
     }
 
     /**

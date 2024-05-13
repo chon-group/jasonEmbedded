@@ -29,41 +29,15 @@ public class MindInspectorApi {
     /** Instância. */
     public static MindInspectorApi instance;
 
-    /** Histórico do agente mapeado pelo nome do agente. */
-    private final Map<String, TreeMap<Integer, AgentWrapper>> historyByAgent;
-
     /** Servidor Web. */
     private HttpServer httpServer;
 
-    /**
-     * Construtor.
-     */
-    public MindInspectorApi() {
-        this.historyByAgent = new HashMap<>();
-    }
-
-    /**
-     * Retorna uma instância única da API.
-     *
-     * @return Instância única da API.
-     */
-    public static synchronized MindInspectorApi get() {
+    public static synchronized void init() {
         if (instance == null) {
             instance = new MindInspectorApi();
             instance.start();
             instance.mountAgentsContext();
         }
-        return instance;
-    }
-
-    /**
-     * Seta o histórico de estados do agente.
-     *
-     * @param agentName     Nome do agente.
-     * @param agentWrappers Histórico de estados do agente.
-     */
-    public void setHistory(String agentName, TreeMap<Integer, AgentWrapper> agentWrappers) {
-        this.historyByAgent.put(agentName, agentWrappers);
     }
 
     /**
@@ -97,44 +71,25 @@ public class MindInspectorApi {
                         return;
                     }
 
-                    TreeMap<Integer, AgentWrapper> agentByCycle = this.historyByAgent.get(name);
-                    if (agentByCycle == null) {
+                    Integer cycle = null;
+                    if (parameters.containsKey("cycle")) {
+                        try {
+                            cycle = Integer.parseInt(parameters.get("cycle"));
+                        } catch (NumberFormatException ignored) {
+                        }
+                    }
+
+                    AgentWrapper stateByCycle = AgentStateHistoryHolder.getInstance().get(name, cycle);
+                    if (stateByCycle == null) {
                         exchange.sendResponseHeaders(404, 0);
                         return;
                     }
 
                     exchange.sendResponseHeaders(200, 0);
-
-                    int cycle = 0;
-                    int lastAgentCycle = agentByCycle.lastEntry().getValue().getCurrentCycleNumber();
-                    if (parameters.containsKey("cycle")) {
-                        try {
-                            cycle = Integer.parseInt(parameters.get("cycle"));
-                            if (cycle > lastAgentCycle) {
-                                cycle = lastAgentCycle;
-                            }
-                        } catch (NumberFormatException ignored) {
-                            cycle = lastAgentCycle;
-                        }
-                    }
-
-                    AgentWrapper agentWrapper = agentByCycle.get(cycle);
-                    agentWrapper.setTotalCycleNumber(lastAgentCycle);
-
-                    json = GSON_INSTANCE.toJson(agentWrapper);
+                    json = GSON_INSTANCE.toJson(stateByCycle);
                 } else {
                     exchange.sendResponseHeaders(200, 0);
-
-                    List<AgentWrapper> returnAgentWrappers = new ArrayList<>();
-
-                    for (String agentName : this.historyByAgent.keySet()) {
-                        TreeMap<Integer, AgentWrapper> integerAgentWrapperTreeMap = this.historyByAgent.get(agentName);
-                        AgentWrapper agent = integerAgentWrapperTreeMap.lastEntry().getValue();
-                        agent.setTotalCycleNumber(agent.getCurrentCycleNumber());
-                        returnAgentWrappers.add(agent);
-                    }
-
-                    json = GSON_INSTANCE.toJson(returnAgentWrappers, new TypeToken<ArrayList<AgentWrapper>>() {
+                    json = GSON_INSTANCE.toJson(AgentStateHistoryHolder.getInstance().getAll(), new TypeToken<ArrayList<AgentWrapper>>() {
                     }.getType());
                 }
 
