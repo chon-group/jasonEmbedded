@@ -1,234 +1,62 @@
-<project>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>net.sf.jason</groupId>
-  <artifactId>mast</artifactId>
-  <packaging>jar</packaging>
-  <name>MAST</name>
-  <version>0.0.0</version>
-  <description>Jason is a fully-fledged interpreter for an extended version of AgentSpeak, a BDI agent-oriented logic programming language, and is implemented in Java. Using JADE a multi-agent system can be distributed over a network effortlessly.</description>
-  <url>http://jason.sf.net</url>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <licenses>
-    <license>
-      <name>GNU Library or Lesser General Public License version 2.0 (LGPLv2)</name>
-      <url>http://www.gnu.org/licenses/gpl-2.0.html</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
+    <groupId>org.example</groupId>
+    <artifactId>jasonEmbedded</artifactId>
+    <version>1.1-SNAPSHOT</version>
 
-  <scm>
-    <url>svn://svn.code.sf.net/p/jason/svn/trunk</url>
-    <connection>svn://svn.code.sf.net/p/jason/svn/trunk</connection>
-  </scm>
-
-  <developers>
-    <developer>
-      <id>Jomi</id>
-      <name>Jomi F.  Hubner</name>
-      <email>jomifred@gmail.com</email>
-    </developer>
-    <developer>
-      <id>Rafael</id>
-      <name>Rafael H. Bordini</name>
-      <email>rafael.h.bordini@gmail.com</email>
-    </developer>
-  </developers>
-
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.8</version>
-        <executions>
-          <execution>
-            <phase>generate-resources</phase>
-            <configuration>
-              <tasks>
-                <echo message="Descompactando pasta Jason-1.4.1" />
-                <unzip src="Jason-1.4.1.zip" dest="target/MAST-${project.version}" />
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.0.0</version>
-        <configuration>
-          <finalName>jason</finalName>
-          <archive>
-            <manifest>
-              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-              <addClasspath>true</addClasspath>
-              <mainClass>jason.util.ConfigGUI</mainClass>
-            </manifest>
-          </archive>
-          <outputDirectory>target/MAST-${project.version}/lib</outputDirectory>
-        </configuration>
-      </plugin>
-      <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <configuration>
-              <source>8</source>
-              <target>8</target>
-          </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.0.0</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <archive>
-                <manifest>
-                  <mainClass>jason.infra.centralised.RunCentralisedMAS</mainClass>
-                </manifest>
-              </archive>
-              <descriptorRefs>
-                <descriptorRef>jar-with-dependencies</descriptorRef>
-              </descriptorRefs>
-              <finalName>jason-embedded</finalName>
-              <appendAssemblyId>false</appendAssemblyId>
-              <outputDirectory>target</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources>
-  </build>
-
-  <dependencies>
-    <!-- https://mvnrepository.com/artifact/javax.mail/javax.mail-api -->
-    <dependency>
-      <groupId>com.sun.mail</groupId>
-      <artifactId>javax.mail</artifactId>
-      <version>1.6.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.13.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>mastransport.jedit</groupId>
-      <artifactId>jedit</artifactId>
-      <version>1.4.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>mastransport.BufferTabs</groupId>
-      <artifactId>BufferTabs</artifactId>
-      <version>1.4.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>mastransport.SideKick</groupId>
-      <artifactId>SideKick</artifactId>
-      <version>1.4.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>mastransport.ErrorList</groupId>
-      <artifactId>ErrorList</artifactId>
-      <version>1.4.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>mastransport.jade</groupId>
-      <artifactId>jade</artifactId>
-      <version>1.4.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>mastransport.c4jason</groupId>
-      <artifactId>c4jason</artifactId>
-      <version>1.4.1</version>
-    </dependency>
-
-    <dependency>
-        <groupId>mastransport.ant</groupId>
-        <artifactId>ant</artifactId>
-        <version>1.4.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>mastransport.ant-launcher</groupId>
-      <artifactId>ant-launcher</artifactId>
-      <version>1.4.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>mastransport.cartago</groupId>
-      <artifactId>cartago</artifactId>
-      <version>1.4.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>mastransport.commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-      <version>1.3</version>
-    </dependency>
-
-    <dependency>
-      <groupId>mastransport.jacamo</groupId>
-      <artifactId>jacamo</artifactId>
-      <version>1.4.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>mastransport.javacc</groupId>
-      <artifactId>javacc</artifactId>
-      <version>1.4.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>mastransport.moise</groupId>
-      <artifactId>moise</artifactId>
-      <version>1.4.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>mastransport.UmlGraph</groupId>
-      <artifactId>UmlGraph</artifactId>
-      <version>1.4.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>br.pro.turing</groupId>
-      <artifactId>javino_stable</artifactId>
-      <version>1.6.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>br.pucrio.inf.lac</groupId>
-      <artifactId>contextnet</artifactId>
-      <version>2.7</version>
-    </dependency>
-    <!-- Jade 4.0.1/Ant dependency>
-      <groupId>...</groupId>
-      <artifactId>...</artifactId>
-      <version>...</version>
-    </dependency-->
-  </dependencies>
     <properties>
-        <maven.compiler.source>1.5</maven.compiler.source>
-        <maven.compiler.target>1.5</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>jacamo-repo</id>
+            <url>https://raw.githubusercontent.com/jacamo-lang/mvn-repo/master</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <!-- https://github.com/jason-lang/jason -->
+        <dependency>
+            <groupId>io.github.jason-lang</groupId>
+            <artifactId>jason-interpreter</artifactId>
+            <version>3.3.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- https://github.com/chon-group/Argo -->
+        <dependency>
+            <groupId>com.github.chon-group</groupId>
+            <artifactId>Argo</artifactId>
+            <version>1.2</version>
+        </dependency>
+
+        <!-- https://github.com/chon-group/Hermes -->
+        <dependency>
+            <groupId>com.github.chon-group</groupId>
+            <artifactId>Hermes</artifactId>
+            <version>24.5.15</version>
+        </dependency>
+
+        <!-- https://github.com/chon-group/Mailer -->
+        <dependency>
+            <groupId>com.github.chon-group</groupId>
+            <artifactId>Mailer</artifactId>
+            <version>paams2024</version>
+        </dependency>
+
+
+    </dependencies>
+
+
+
 </project>
