@@ -6,7 +6,7 @@
 
     <groupId>group.chon</groupId>
     <artifactId>jasonEmbedded</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>24.7.23</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
