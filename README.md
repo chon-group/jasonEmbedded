@@ -1,14 +1,18 @@
 # jasonEmbedded
 
-Embedded artificial intelligence in Internet of Things (IoT) devices is presented as an option to reduce connectivity dependence, allowing decision-making directly at the edge computing layer.
 
-The Multi-agent Systems (MAS) embedded into IoT devices enables, in addition to the ability to perceive and act in the environment, new characteristics like pro-activity, deliberation, and collaboration capabilities to these devices. 
+|![jasonEmbedded](https://github.com/user-attachments/assets/15f66ef3-b14d-41b5-a90d-429734f44278)|
+|:--:|
+|Embedded artificial intelligence in Internet of Things (IoT) devices is presented as an option to reduce connectivity dependence, allowing decision-making directly at the edge computing layer.The Multi-agent Systems (MAS) embedded into IoT devices enables, in addition to the ability to perceive and act in the environment, new characteristics like pro-activity, deliberation, and collaboration capabilities to these devices. A few new frameworks and extensions enable the construction of agent-based IoT devices. However, no framework allows constructing them with hardware control, adaptability, and fault tolerance, besides agents’ communicability and mobility. This project presents an extension of the [Jason framework](https://github.com/jason-lang/jason) for developing Embedded MAS with BDI agents capable of controlling hardware, communicating, and moving between IoT devices capable of dealing with fault tolerance.|
 
-A few new frameworks and extensions enable the construction of agent-based IoT devices. However, no framework allows constructing them with hardware control, adaptability, and fault tolerance, besides agents’ communicability and mobility. 
+## How to Install?
+1) In a terminal run the commands below:
 
-This project presents an extension of the [Jason framework](https://github.com/jason-lang/jason) for developing Embedded MAS with BDI agents capable of controlling hardware, communicating, and moving between IoT devices capable of dealing with fault tolerance.  
-
-![jasonembedded](https://github.com/chon-group/jasonEmbedded/assets/32855001/8d9b7cdb-c082-46aa-918c-073dc2024ae8)
+```console
+echo "deb [trusted=yes] http://packages.chon.group/ chonos main" | sudo tee /etc/apt/sources.list.d/chonos.list
+sudo apt update
+sudo apt install jason-embedded 
+```
 
 
 ## Publications
