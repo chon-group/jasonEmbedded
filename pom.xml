@@ -58,7 +58,7 @@
         <dependency>
             <groupId>com.github.chon-group</groupId>
             <artifactId>Velluscinum</artifactId>
-            <version>24.3.5</version>
+            <version>24.7.23</version>
         </dependency>
 
     </dependencies>
