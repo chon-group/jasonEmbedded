@@ -21,6 +21,16 @@
 ||.hermes.sendOut(___D___,___f___,___M___)|Dispatches a message to another MAS. Where ___D___ is a literal that represents the identification of the recipient MAS; ___f___ is a illocutionary force (_tell \| untell \| achieve \| unachieve_); ___M___ is a literal that represents the message.|
 ||.hermes.moveOut(___D___,___b___,___A___)|Carries over the agents to other MAS. Where ___D___ is a literal that represents the identification of the recipient MAS; ___b___ is a bio-inspired protocol (_inquilinism \| mutualism \| predation_); ___A___ is one, all, or a set of agents (i.e., all, agent or \[agent<sub>1</sub>, agent<sub>2</sub>, agent<sub>n</sub>\])|
 ||.hermes.disconnect("___X___");|Disconnects at "___X___" ContextNet network.|
+|Mailer|.mailer.credentials(___E___,___K___)|Set email credentials. Where ___E___ is a string that represents the email account (e.g., "_agent@example.com_"); ___K___ is a string that represents the e-mail password.|
+||.mailer.eMailService(\[___I___,___p___\],\[___O___,___q___\])|Set email provider configurations. Where ___I___ is a string that represents the FQDN of the input e-mail server (e.g., "_imap.example.com_"); ___p___ is a literal that represents the input protocol (e.g., _imaps_); ___O___ is a string that represents the FQDN of the output email server(e.g., "_smtp.example.com_"); ___q___ is a literal that represents the output protocol (e.g., _smtpOverTLS_).|
+||.mailer.sendEMail(___D___,___f___,___M___)|Dispatches a email message to another MAS or Human. Where ___D___ is a literal that represents the destination email recipient; ___f___ is a illocutionary force (_tell \| untell \| achieve \| unachieve_); ___M___ is a literal that represents the message.|
+|Jason|.velluscinum.buildWallet(___w___)|Generates a digital wallet and returns the belief: _w(___P___,___Q___)_. Where ___P___ e ___Q___ are literals that represent the agent's key pair.|
+||.velluscinum.deployNFT(___S___,___P___,___Q___,___I___,___M___,___b___)| Registers an asset and returns the belief: _b_(___A___). Where ___A___ is a literal that represents a indivisible asset; ___S___ is a literal that represents the address of a DLT node; ___P___ and ___Q___ are literals that represent the agent's key pair; ___I___ is a key-value array that represents the immutable data of an asset; ___M___ is a key-value array representing asset or transaction metadata;|
+||.velluscinum.transferNFT(___S___,___P___,___Q___,___A___,___R___,___M___,___b___)| Transfers an asset and returns the belief: _b_(___T___). Where ___T___ is a literal that represents a transaction performed in the DTL; ___S___ is a literal that represents the address of a DLT node; ___P___ and ___Q___ are literals that represent the agent's key pair; ___A___ is a literal that represents a indivisible asset; ___R___ is a literal that represents the public key of a recipient agent; ___M___ is a key-value array representing asset or transaction metadata;|
+||||
+||||
+||||
+||||
 
 ## Publications
 + Brazilian Conference on Intelligent Systems 2023 (Full paper) - [A Spin-off Version of Jason for IoT and Embedded Multi-Agent Systems](https://www.researchgate.net/publication/374620450_A_Spin-off_Version_of_Jason_for_IoT_and_Embedded_Multi-Agent_Systems)
