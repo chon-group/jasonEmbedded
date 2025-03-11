@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 public class Main {
     public static void main(String[] args) throws JasonException, IOException {
         Logger logger = Logger.getLogger("jasonEmbedded");
-        logger.info("Version 24.7.23 (Argo+Hermes+Mailer+Velluscinum)");
+        logger.info("Version 25.3.11 (Argo+Hermes+Mailer+Velluscinum)");
         File mas2jFile = new File(args[0]);
         File mas2jAbsolutePath = new File(mas2jFile.getAbsolutePath());
         File mas2jLoggingPropertiesFile = new File(mas2jAbsolutePath.getParent()+File.separator+ "logging.properties");

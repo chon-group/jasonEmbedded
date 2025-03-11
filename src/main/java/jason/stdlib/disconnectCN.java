@@ -1,6 +1,7 @@
 package jason.stdlib;
 
 import group.chon.agent.hermes.jasonStdLib.configureContextNetConnection;
+import group.chon.agent.hermes.jasonStdLib.disconnect;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
@@ -9,14 +10,11 @@ import jason.asSyntax.Term;
 
 import java.util.logging.Logger;
 
-public class connectCN extends group.chon.agent.hermes.jasonStdLib.connect {
+public class disconnectCN extends group.chon.agent.hermes.jasonStdLib.disconnect{
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        //Logger logger = Logger.getLogger(ts.getAgArch().getAgName());
-        //logger.info("Connecting in contextNet IoT Network...");
 
-        Term[] newArgs = createNewArray(args);
-        DefaultInternalAction hermesConfigureCN = new configureContextNetConnection();
-        hermesConfigureCN.execute(ts,un,newArgs);
+        //Logger logger = Logger.getLogger(ts.getAgArch().getAgName());
+        //logger.info("Disconnecting from contextNet IoT Network...");
 
         Term[] onlyOneArg = new Term[1];
         onlyOneArg[0] = Literal.parseLiteral("contextNet");
