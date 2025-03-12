@@ -6,7 +6,7 @@
 
     <groupId>group.chon</groupId>
     <artifactId>jasonEmbedded</artifactId>
-    <version>25.3.11</version>
+    <version>25.3.12</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>com.github.chon-group</groupId>
             <artifactId>Hermes</artifactId>
-            <version>24.5.15</version>
+            <version>25.3.12</version>
         </dependency>
 
         <!-- https://github.com/chon-group/Mailer -->
