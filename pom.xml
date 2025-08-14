@@ -6,11 +6,11 @@
 
     <groupId>group.chon</groupId>
     <artifactId>jasonEmbedded</artifactId>
-    <version>25.3.19</version>
+    <version>25.3.28</version>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>com.github.chon-group</groupId>
             <artifactId>Hermes</artifactId>
-            <version>25.3.12</version>
+            <version>25.3.26</version>
         </dependency>
 
         <!-- https://github.com/chon-group/Mailer -->
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>com.github.chon-group</groupId>
             <artifactId>Velluscinum</artifactId>
-            <version>24.7.23</version>
+            <version>25.8.13</version>
         </dependency>
 
     </dependencies>
