@@ -6,7 +6,7 @@
 
     <groupId>group.chon</groupId>
     <artifactId>jasonEmbedded</artifactId>
-    <version>25.3.28</version>
+    <version>25.8.14</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -40,11 +40,17 @@
             <version>1.2</version>
         </dependency>
 
-        <!-- https://github.com/chon-group/Hermes -->
+<!--        &lt;!&ndash; https://github.com/chon-group/Hermes &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.github.chon-group</groupId>-->
+<!--            <artifactId>Hermes</artifactId>-->
+<!--            <version>25.3.26</version>-->
+<!--        </dependency>-->
+
         <dependency>
             <groupId>com.github.chon-group</groupId>
-            <artifactId>Hermes</artifactId>
-            <version>25.3.26</version>
+            <artifactId>Concierge</artifactId>
+            <version>25.8.14</version>
         </dependency>
 
         <!-- https://github.com/chon-group/Mailer -->

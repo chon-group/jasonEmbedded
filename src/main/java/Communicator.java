@@ -1,6 +1,6 @@
 import java.util.logging.Logger;
 
-public class Communicator extends group.chon.agent.hermes.Hermes{
+public class Communicator extends group.chon.agent.concierge.Concierge{
     @Override
     public void init() throws Exception {
 //        /*  in next version */
