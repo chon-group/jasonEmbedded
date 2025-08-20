@@ -6,7 +6,7 @@
 
     <groupId>group.chon</groupId>
     <artifactId>jasonEmbedded</artifactId>
-    <version>25.8.14</version>
+    <version>25.8.20</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -64,7 +64,7 @@
         <dependency>
             <groupId>com.github.chon-group</groupId>
             <artifactId>Velluscinum</artifactId>
-            <version>25.8.13</version>
+            <version>25.8.19</version>
         </dependency>
 
     </dependencies>
