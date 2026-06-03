@@ -1,5 +1,5 @@
 # jasonEmbedded
-
+[![](https://jitpack.io/v/chon-group/jasonEmbedded.svg)](https://jitpack.io/#chon-group/jasonEmbedded)
 
 |![jasonEmbedded](https://github.com/user-attachments/assets/15f66ef3-b14d-41b5-a90d-429734f44278)|
 |:--:|
